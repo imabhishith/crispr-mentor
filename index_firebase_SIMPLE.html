@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRISPR | Mentor Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; transition: all 0.3s ease; }
+        .tab-active { border-bottom: 4px solid #4f46e5; color: #4f46e5; }
+        .hidden { display: none; }
+        .glass-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); }
+        .stat-value { font-family: 'Inter', sans-serif; letter-spacing: -0.05em; }
+        .section-fade { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .online-indicator { width: 12px; height: 12px; background: #10b981; border-radius: 50%; display: inline-block; animation: pulse 2s infinite; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .sync-status { position: fixed; top-20 right-6; padding: 12px 20px; border-radius: 12px; font-size: 12px; font-weight: bold; z-index: 50; }
+        .sync-success { background: #d1fae5; color: #065f46; }
+        .sync-error { background: #fee2e2; color: #7f1d1d; }
+        .sync-pending { background: #fef3c7; color: #78350f; }
+        .active-users { position: fixed; top-20 left-6; padding: 12px 20px; background: white; border-radius: 12px; border: 1px solid #e2e8f0; font-size: 12px; z-index: 50; }
+        .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 100; }
+    </style>
+</head>
+<body class="bg-[#f1f5f9] text-slate-900 min-h-screen">
+
+    <div class="sync-status sync-pending" id="syncStatus">🔄 Initializing...</div>
+    <div class="active-users" id="activeUsers">👥 Users Online: <span id="userCount">0</span></div>
+
+    <!-- Setup Modal - Shows only once on first visit -->
+    <div id="setupModal" class="modal-backdrop hidden">
+        <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md mx-4">
+            <h2 class="text-2xl font-black mb-4 text-slate-800">🚀 One-Time Setup</h2>
+            <p class="text-slate-600 mb-6">The Head of Institute needs to set up Firebase once. This will be saved for everyone.</p>
+            <div class="space-y-4 mb-6">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Firebase API Key</label>
+                    <input type="text" id="fbApiKey" placeholder="AIzaSy..." class="w-full p-3 border border-slate-200 rounded-xl text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Project ID</label>
+                    <input type="text" id="fbProjectId" placeholder="crispr-mentor" class="w-full p-3 border border-slate-200 rounded-xl text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Database URL</label>
+                    <input type="text" id="fbDatabaseUrl" placeholder="https://crispr-mentor.firebaseio.com" class="w-full p-3 border border-slate-200 rounded-xl text-sm">
+                </div>
+                <a href="https://firebase.google.com" target="_blank" class="text-indigo-600 text-sm underline block">Get Firebase credentials →</a>
+            </div>
+            <button onclick="saveFirebaseConfig()" class="w-full bg-indigo-600 text-white py-3 rounded-xl hover:bg-indigo-700 font-bold">
+                Save & Connect
+            </button>
+            <p class="text-xs text-slate-500 mt-4 text-center">Other users can proceed without setting this up. Configuration will be ready when they reload.</p>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto py-10 px-6">
+        
+        <header class="flex flex-col md:flex-row items-center justify-between mb-12 bg-white p-6 rounded-3xl shadow-xl shadow-slate-200/60 border border-white">
+            <div class="flex items-center space-x-5">
+                <div class="w-14 h-14 bg-gradient-to-br from-indigo-600 to-violet-700 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-indigo-200">
+                    <span class="text-2xl font-black tracking-tighter italic">C</span>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-black tracking-tight text-slate-800">CRISPR</h1>
+                    <p class="text-indigo-500 font-bold text-[10px] uppercase tracking-[0.2em]">Academic Excellence Hub</p>
+                </div>
+            </div>
+            
+            <div class="mt-6 md:mt-0 flex flex-col items-center space-y-3">
+                <div class="flex items-center space-x-2">
+                    <span class="online-indicator"></span>
+                    <span class="text-xs font-bold text-emerald-600">Real-time Sync Active</span>
+                </div>
+                <div class="relative">
+                    <input type="text" id="searchInput" onkeyup="filterTasks()" placeholder="Search logs..." 
+                           class="pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none w-64 transition-all">
+                    <svg class="w-5 h-5 absolute left-3 top-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                </div>
+            </div>
+        </header>
+
+        <nav class="flex border-b border-slate-300 mb-10 justify-start space-x-8 md:space-x-12 px-2">
+            <button onclick="switchTab('log')" id="tab-log" class="tab-active pb-4 font-extrabold text-sm md:text-base uppercase tracking-wider transition-all">Assignment Desk</button>
+            <button onclick="switchTab('reports')" id="tab-reports" class="pb-4 font-extrabold text-sm md:text-base text-slate-400 hover:text-indigo-600 uppercase tracking-wider transition-all">Performance Insights</button>
+            <button onclick="switchTab('profiles')" id="tab-profiles" class="pb-4 font-extrabold text-sm md:text-base text-slate-400 hover:text-indigo-600 uppercase tracking-wider transition-all">Mentor Profiles</button>
+        </nav>
+
+        <main id="section-log" class="grid grid-cols-1 xl:grid-cols-12 gap-10 section-fade">
+            <div class="xl:col-span-4">
+                <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 sticky top-10">
+                    <h2 class="text-xl font-black mb-8 text-slate-800 flex items-center">
+                        <span class="w-2 h-8 bg-indigo-600 rounded-full mr-3"></span>
+                        Log Daily Work
+                    </h2>
+                    <form id="workForm" class="space-y-6">
+                        <div>
+                            <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Your Name / Role</label>
+                            <select id="currentUser" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none font-semibold text-slate-700 appearance-none" required>
+                                <option value="">Select your role...</option>
+                                <option value="AADISANKAR D">AADISANKAR D (Co-mentor)</option>
+                                <option value="ABHISHITH S D">ABHISHITH S D (Co-mentor)</option>
+                                <option value="ADHIL">ADHIL (Co-mentor)</option>
+                                <option value="GAUTHAM THEJUR">GAUTHAM THEJUR (Co-mentor)</option>
+                                <option value="HAN JOSEPH">HAN JOSEPH (Co-mentor)</option>
+                                <option value="ZAFIR">ZAFIR (Co-mentor)</option>
+                                <option value="HEAD_INSTITUTE">Head of Institute</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Mentor to Assign Work</label>
+                            <select id="mentor" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none font-semibold text-slate-700 appearance-none" required>
+                                <option value="AADISANKAR D">AADISANKAR D</option>
+                                <option value="ABHISHITH S D">ABHISHITH S D</option>
+                                <option value="ADHIL">ADHIL</option>
+                                <option value="GAUTHAM THEJUR">GAUTHAM THEJUR</option>
+                                <option value="HAN JOSEPH">HAN JOSEPH</option>
+                                <option value="ZAFIR">ZAFIR</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Task Category</label>
+                            <div class="grid grid-cols-2 gap-4">
+                                <label class="cursor-pointer group">
+                                    <input type="radio" name="workType" value="WORKSHEET" checked onchange="toggleChapterInput(true)" class="hidden peer">
+                                    <div class="p-4 border-2 border-slate-100 rounded-2xl text-center font-bold text-slate-500 peer-checked:border-indigo-600 peer-checked:bg-indigo-50 peer-checked:text-indigo-600 group-hover:bg-slate-50 transition-all">Worksheet</div>
+                                </label>
+                                <label class="cursor-pointer group">
+                                    <input type="radio" name="workType" value="EXAM" onchange="toggleChapterInput(false)" class="hidden peer">
+                                    <div class="p-4 border-2 border-slate-100 rounded-2xl text-center font-bold text-slate-500 peer-checked:border-indigo-600 peer-checked:bg-indigo-50 peer-checked:text-indigo-600 group-hover:bg-slate-50 transition-all">Exam</div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Date</label>
+                                <input type="date" id="date" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none font-semibold text-slate-700" required>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Subject</label>
+                                <select id="subject" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none font-semibold text-slate-700 appearance-none" required>
+                                    <option value="Biology">Biology</option>
+                                    <option value="Chemistry">Chemistry</option>
+                                    <option value="Physics">Physics</option>
+                                    <option value="Maths">Maths</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="chapterContainer">
+                            <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Chapter Name</label>
+                            <input type="text" id="chapter" placeholder="Enter topic..." class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none font-semibold">
+                        </div>
+
+                        <button type="submit" class="w-full bg-indigo-600 text-white py-5 rounded-2xl hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-200 font-black uppercase tracking-widest text-sm">Submit Work Log</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="xl:col-span-8">
+                <div class="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+                    <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center">
+                        <h2 class="font-black text-xl text-slate-800">Live Work Logs</h2>
+                        <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full" id="taskCount">0 tasks</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full border-collapse">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th class="px-6 py-4 text-left font-black text-[10px] text-slate-400 uppercase tracking-widest">Date</th>
+                                    <th class="px-6 py-4 text-left font-black text-[10px] text-slate-400 uppercase tracking-widest">Work</th>
+                                    <th class="px-6 py-4 text-left font-black text-[10px] text-slate-400 uppercase tracking-widest">Assigned To</th>
+                                    <th class="px-6 py-4 text-left font-black text-[10px] text-slate-400 uppercase tracking-widest">Status</th>
+                                    <th class="px-6 py-4 text-left font-black text-[10px] text-slate-400 uppercase tracking-widest">Logged By</th>
+                                    <th class="px-6 py-4 text-right font-black text-[10px] text-slate-400 uppercase tracking-widest">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="taskBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <main id="section-reports" class="hidden section-fade">
+            <div id="reportContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+        </main>
+
+        <main id="section-profiles" class="hidden section-fade">
+            <div id="profileContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+        </main>
+
+    </div>
+
+    <script>
+        let db = null;
+        let tasks = [];
+        let mentors = ['AADISANKAR D', 'ABHISHITH S D', 'ADHIL', 'GAUTHAM THEJUR', 'HAN JOSEPH', 'ZAFIR'];
+        let subjects = ['Biology', 'Chemistry', 'Physics', 'Maths'];
+        let currentUserId = null;
+        let activeUsersCount = 0;
+
+        const mentorDetails = {
+            'AADISANKAR D': { role: 'Co-mentor', bio: 'Specializes in Biology and student mentoring', expertise: ['Biology', 'Research'] },
+            'ABHISHITH S D': { role: 'Co-mentor', bio: 'Expert in Physics and Mathematics', expertise: ['Physics', 'Maths'] },
+            'ADHIL': { role: 'Co-mentor', bio: 'Chemistry specialist with industry experience', expertise: ['Chemistry', 'Lab Work'] },
+            'GAUTHAM THEJUR': { role: 'Co-mentor', bio: 'Comprehensive subject knowledge across all domains', expertise: ['Biology', 'Chemistry', 'Physics'] },
+            'HAN JOSEPH': { role: 'Co-mentor', bio: 'Student development and behavioral coaching expert', expertise: ['Counseling', 'Academics'] },
+            'ZAFIR': { role: 'Co-mentor', bio: 'Mathematics and logic problem expert', expertise: ['Maths', 'Problem Solving'] }
+        };
+
+        // Initialize Firebase
+        function initFirebase() {
+            const apiKey = localStorage.getItem('fbApiKey');
+            
+            // If not configured, show setup modal
+            if (!apiKey) {
+                document.getElementById('setupModal').classList.remove('hidden');
+                addSampleData(); // Show demo data while waiting for setup
+                return false;
+            }
+
+            const config = {
+                apiKey: apiKey,
+                authDomain: localStorage.getItem('fbProjectId') + '.firebaseapp.com',
+                databaseURL: localStorage.getItem('fbDatabaseUrl'),
+                projectId: localStorage.getItem('fbProjectId')
+            };
+
+            try {
+                firebase.initializeApp(config);
+                db = firebase.database();
+                updateSyncStatus('Connected to Firebase', 'success');
+                listenToRealTimeUpdates();
+                trackActiveUsers();
+                return true;
+            } catch (e) {
+                console.error('Firebase error:', e);
+                updateSyncStatus('Firebase error - check credentials', 'error');
+                addSampleData();
+                return false;
+            }
+        }
+
+        function addSampleData() {
+            // Add sample data so we can see reports and profiles working
+            tasks = [
+                { id: 1, mentor: 'AADISANKAR D', type: 'WORKSHEET', subject: 'Biology', chapter: 'Cell Biology', date: '2024-01-10', completed: true, loggedBy: 'HEAD_INSTITUTE', timestamp: '2024-01-10T10:00:00Z' },
+                { id: 2, mentor: 'ABHISHITH S D', type: 'EXAM', subject: 'Physics', chapter: 'N/A', date: '2024-01-11', completed: true, loggedBy: 'AADISANKAR D', timestamp: '2024-01-11T11:00:00Z' },
+                { id: 3, mentor: 'ADHIL', type: 'WORKSHEET', subject: 'Chemistry', chapter: 'Organic Chemistry', date: '2024-01-12', completed: false, loggedBy: 'ABHISHITH S D', timestamp: '2024-01-12T12:00:00Z' },
+            ];
+            renderAll();
+        }
+
+        function saveFirebaseConfig() {
+            const apiKey = document.getElementById('fbApiKey').value;
+            const projectId = document.getElementById('fbProjectId').value;
+            const databaseUrl = document.getElementById('fbDatabaseUrl').value;
+
+            if (!apiKey || !projectId || !databaseUrl) {
+                alert('Please fill all Firebase configuration fields');
+                return;
+            }
+
+            localStorage.setItem('fbApiKey', apiKey);
+            localStorage.setItem('fbProjectId', projectId);
+            localStorage.setItem('fbDatabaseUrl', databaseUrl);
+
+            alert('Configuration saved! Reloading page...');
+            location.reload();
+        }
+
+        function updateSyncStatus(message, status) {
+            const el = document.getElementById('syncStatus');
+            el.textContent = (status === 'success' ? '✓ ' : status === 'error' ? '✗ ' : '🔄 ') + message;
+            el.className = 'sync-status sync-' + status;
+        }
+
+        function trackActiveUsers() {
+            if (!db) return;
+            const usersRef = db.ref('activeUsers');
+            const myRef = usersRef.child(currentUserId || 'guest-' + Date.now());
+            
+            myRef.onDisconnect().remove();
+            myRef.set({ timestamp: firebase.database.ServerValue.TIMESTAMP, name: document.getElementById('currentUser').value || 'Unknown' });
+
+            usersRef.on('value', (snap) => {
+                activeUsersCount = snap.numChildren();
+                document.getElementById('userCount').textContent = activeUsersCount;
+            });
+        }
+
+        function listenToRealTimeUpdates() {
+            if (!db) return;
+            db.ref('tasks').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    tasks = Object.values(data);
+                } else {
+                    tasks = [];
+                }
+                console.log('Tasks loaded:', tasks.length);
+                renderAll();
+                updateSyncStatus('Synced', 'success');
+            }, (error) => {
+                console.error('Firebase error:', error);
+                updateSyncStatus('Connection error', 'error');
+            });
+        }
+
+        function renderAll() {
+            renderTasks();
+            renderReports();
+            renderProfiles();
+        }
+
+        function toggleChapterInput(show) {
+            document.getElementById('chapterContainer').style.display = show ? 'block' : 'none';
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('[id^="section-"]').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('[id^="tab-"]').forEach(el => el.classList.remove('tab-active'));
+            document.getElementById('section-' + tab).classList.remove('hidden');
+            document.getElementById('tab-' + tab).classList.add('tab-active');
+            
+            // Re-render when switching tabs
+            if (tab === 'reports') {
+                renderReports();
+            } else if (tab === 'profiles') {
+                renderProfiles();
+            }
+        }
+
+        document.getElementById('workForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!db) {
+                alert('Firebase not configured yet. Please wait for setup to complete.');
+                return;
+            }
+
+            const mentor = document.getElementById('mentor').value;
+            const currentUser = document.getElementById('currentUser').value;
+            
+            if (!currentUser) {
+                alert('Please select your role first');
+                return;
+            }
+
+            const task = {
+                id: Date.now(),
+                mentor: mentor,
+                type: document.querySelector('input[name="workType"]:checked').value,
+                subject: document.getElementById('subject').value,
+                chapter: document.getElementById('chapter').value || 'N/A',
+                date: document.getElementById('date').value,
+                completed: false,
+                loggedBy: currentUser,
+                timestamp: new Date().toISOString()
+            };
+
+            try {
+                updateSyncStatus('Saving...', 'pending');
+                await db.ref('tasks').child(task.id.toString()).set(task);
+                document.getElementById('workForm').reset();
+                document.getElementById('date').valueAsDate = new Date();
+                updateSyncStatus('Saved successfully', 'success');
+            } catch (e) {
+                updateSyncStatus('Save failed', 'error');
+                console.error(e);
+            }
+        });
+
+        function markComplete(id) {
+            if (!db) {
+                const task = tasks.find(t => t.id === id);
+                if (task) task.completed = !task.completed;
+                renderAll();
+                return;
+            }
+            updateSyncStatus('Updating...', 'pending');
+            db.ref('tasks/' + id + '/completed').set(true).then(() => {
+                updateSyncStatus('Updated', 'success');
+            }).catch(err => {
+                console.error('Error updating:', err);
+                updateSyncStatus('Update failed', 'error');
+            });
+        }
+
+        function deleteTask(id) {
+            if (!confirm('Are you sure you want to delete this log entry?')) return;
+            
+            if (!db) {
+                tasks = tasks.filter(t => t.id !== id);
+                renderAll();
+                updateSyncStatus('Deleted', 'success');
+                return;
+            }
+            
+            updateSyncStatus('Deleting...', 'pending');
+            db.ref('tasks').child(id.toString()).remove().then(() => {
+                updateSyncStatus('Deleted successfully', 'success');
+            }).catch(err => {
+                console.error('Error deleting:', err);
+                updateSyncStatus('Delete failed', 'error');
+            });
+        }
+
+        function renderTasks() {
+            const container = document.getElementById('taskBody');
+            container.innerHTML = "";
+            document.getElementById('taskCount').textContent = tasks.length + ' tasks';
+
+            tasks.forEach(task => {
+                const row = document.createElement('tr');
+                const dateObj = new Date(task.date);
+                const formattedDate = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+                row.innerHTML = `
+                    <td class="px-6 py-6 font-bold text-slate-400 text-xs uppercase tracking-tighter">
+                        ${formattedDate}
+                    </td>
+                    <td class="px-6 py-6">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl flex items-center justify-center font-black text-xs ${task.type === 'EXAM' ? 'bg-rose-100 text-rose-600' : 'bg-blue-100 text-blue-600'}">
+                                ${task.type === 'EXAM' ? 'EX' : 'WS'}
+                            </div>
+                            <div>
+                                <div class="font-bold text-slate-900">${task.subject}</div>
+                                <div class="text-[11px] text-slate-500 font-medium">${task.chapter !== 'N/A' ? task.chapter : 'Subject Examination'}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-6 text-xs font-bold text-indigo-700">${task.mentor}</td>
+                    <td class="px-6 py-6">
+                        <span class="inline-flex items-center px-3 py-1 text-[9px] font-black rounded-lg ${task.completed ? 'bg-emerald-100 text-emerald-700' : 'bg-orange-100 text-orange-700'} uppercase tracking-widest">
+                            ${task.completed ? 'Completed' : 'Assigned'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-6 text-xs font-bold text-slate-600">${task.loggedBy || 'Unknown'}</td>
+                    <td class="px-6 py-6 text-right space-x-2">
+                        ${!task.completed ? `<button onclick="markComplete(${task.id})" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-[10px] font-black hover:bg-indigo-700 shadow-md transition uppercase tracking-widest">Finish</button>` : ''}
+                        <button onclick="deleteTask(${task.id})" class="bg-rose-500 text-white px-4 py-2 rounded-xl text-[10px] font-black hover:bg-rose-600 shadow-md transition uppercase tracking-widest">Delete</button>
+                    </td>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function renderReports() {
+            const container = document.getElementById('reportContainer');
+            container.innerHTML = "";
+
+            if (tasks.length === 0) {
+                container.innerHTML = '<div class="col-span-full text-center py-12"><p class="text-slate-500">No tasks logged yet. Create some entries to see performance insights.</p></div>';
+                return;
+            }
+
+            mentors.forEach(mentor => {
+                const mentorTasks = tasks.filter(t => t.mentor === mentor && t.completed);
+                const wsCount = mentorTasks.filter(t => t.type === 'WORKSHEET').length;
+                const exCount = mentorTasks.filter(t => t.type === 'EXAM').length;
+                
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-[2rem] shadow-xl border border-slate-100 overflow-hidden';
+                card.innerHTML = `
+                    <div class="p-8 pb-4">
+                        <h3 class="text-xl font-black text-slate-800 tracking-tighter">${mentor}</h3>
+                        <p class="text-[10px] font-black text-indigo-500 uppercase tracking-widest">Performance Matrix</p>
+                    </div>
+                    <div class="px-8 pb-8 pt-4 grid grid-cols-2 gap-4">
+                        <div class="bg-indigo-50 p-5 rounded-3xl">
+                            <span class="block text-[32px] font-black text-indigo-700 stat-value leading-none">${wsCount}</span>
+                            <span class="text-[9px] font-black text-indigo-400 uppercase tracking-widest">Worksheets</span>
+                        </div>
+                        <div class="bg-rose-50 p-5 rounded-3xl">
+                            <span class="block text-[32px] font-black text-rose-700 stat-value leading-none">${exCount}</span>
+                            <span class="text-[9px] font-black text-rose-400 uppercase tracking-widest">Exams</span>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 p-6 space-y-3">
+                        ${subjects.map(s => {
+                            const count = mentorTasks.filter(t => t.subject === s).length;
+                            return `<div class="flex justify-between items-center text-xs">
+                                <span class="font-bold text-slate-500">${s}</span>
+                                <span class="font-black text-slate-800">${count}</span>
+                            </div>`;
+                        }).join('')}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderProfiles() {
+            const container = document.getElementById('profileContainer');
+            container.innerHTML = "";
+            
+            mentors.forEach(name => {
+                const data = mentorDetails[name];
+                const total = tasks.filter(t => t.mentor === name && t.completed).length;
+                
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-[2rem] p-8 shadow-xl border border-slate-100 text-center flex flex-col items-center';
+                card.innerHTML = `
+                    <div class="w-24 h-24 bg-gradient-to-tr from-indigo-500 to-violet-500 text-white rounded-[2rem] flex items-center justify-center mb-6 text-3xl font-black shadow-lg shadow-indigo-100 rotate-3">
+                        ${name.charAt(0)}
+                    </div>
+                    <h3 class="font-black text-slate-900 text-xl tracking-tight">${name}</h3>
+                    <p class="text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-4 bg-indigo-50 px-3 py-1 rounded-full">${data.role}</p>
+                    <p class="text-slate-500 text-sm leading-relaxed mb-6 font-medium px-4">${data.bio}</p>
+                    <div class="flex flex-wrap justify-center gap-2 mb-8">
+                        ${data.expertise.map(ex => `<span class="px-3 py-1 bg-slate-100 text-slate-600 text-[9px] font-black rounded-lg uppercase">${ex}</span>`).join('')}
+                    </div>
+                    <div class="w-full pt-6 border-t border-slate-100">
+                        <div class="text-4xl font-black text-slate-900 stat-value">${total}</div>
+                        <p class="text-[9px] text-slate-400 font-black uppercase tracking-[0.2em] mt-1">Completed Tasks</p>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterTasks() {
+            const input = document.getElementById('searchInput').value.toUpperCase();
+            const tr = document.getElementById('taskBody').getElementsByTagName('tr');
+            for (let i = 0; i < tr.length; i++) {
+                const textValue = tr[i].textContent || tr[i].innerText;
+                tr[i].style.display = textValue.toUpperCase().indexOf(input) > -1 ? "" : "none";
+            }
+        }
+
+        // Set today's date
+        document.getElementById('date').valueAsDate = new Date();
+
+        // Initialize
+        currentUserId = 'user-' + Date.now();
+        initFirebase();
+    </script>
+</body>
+</html>
