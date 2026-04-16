@@ -8,224 +8,148 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
 :root {
-  --bg: #07090f;
-  --s1: #0d111c;
-  --s2: #131926;
-  --s3: #1a2235;
-  --s4: #212d45;
-  --acc: #4f9eff;
-  --acc2: #a78bfa;
-  --acc3: #34d399;
-  --acc4: #f59e0b;
-  --acc5: #f87171;
-  --bio: #22d3ee;
-  --chm: #a78bfa;
-  --phy: #fb923c;
-  --mth: #4ade80;
-  --t1: #f0f4ff;
-  --t2: #8892b0;
-  --t3: #4a5568;
-  --t4: #2d3748;
-  --bdr: rgba(255,255,255,0.06);
-  --bdr2: rgba(255,255,255,0.11);
-  --r: 10px;
-  --r2: 14px;
-  --r3: 20px;
+  --bg:#07090f; --s1:#0d111c; --s2:#131926; --s3:#1a2235; --s4:#212d45;
+  --acc:#4f9eff; --acc2:#a78bfa; --acc3:#34d399; --acc4:#f59e0b; --acc5:#f87171;
+  --bio:#22d3ee; --chm:#a78bfa; --phy:#fb923c; --mth:#4ade80;
+  --t1:#f0f4ff; --t2:#8892b0; --t3:#4a5568; --t4:#2d3748;
+  --bdr:rgba(255,255,255,0.06); --bdr2:rgba(255,255,255,0.11);
+  --r:10px; --r2:14px; --r3:20px;
 }
-
-html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t1); overflow-x: hidden; }
-
-/* ── AUTH GUARD ── */
-#authGuard { display: none; position: fixed; inset: 0; z-index: 9999; background: var(--bg); align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
-#authGuard.show { display: flex; }
-.guard-icon { font-size: 40px; color: var(--acc5); }
-.guard-text { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; color: var(--t1); }
-.guard-sub { font-size: 13px; color: var(--t2); }
-
-/* ── SCROLLBAR ── */
-::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--s4); border-radius: 4px; }
-
-/* ── SIDEBAR ── */
-#sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 220px; background: var(--s1); border-right: 1px solid var(--bdr); display: flex; flex-direction: column; z-index: 50; transition: transform 0.3s; }
-.sb-logo { padding: 20px 18px 16px; border-bottom: 1px solid var(--bdr); display: flex; align-items: center; gap: 10px; }
-.sb-logo-fb { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--acc), var(--acc2)); display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 800; color: #fff; flex-shrink: 0; box-shadow: 0 4px 14px rgba(79,158,255,0.25); }
-.sb-brand { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 800; letter-spacing: 2px; color: var(--t1); line-height: 1.3; }
-.sb-brand small { display: block; font-size: 9px; color: var(--acc); font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; }
-
-.sb-user { padding: 12px 14px; border-bottom: 1px solid var(--bdr); }
-.sb-user-inner { background: var(--s2); border: 1px solid var(--bdr2); border-radius: var(--r2); padding: 10px 12px; display: flex; align-items: center; gap: 10px; }
-.sb-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--acc), var(--acc2)); display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 800; color: #fff; flex-shrink: 0; }
-.sb-avatar.owner { background: linear-gradient(135deg, var(--acc2), #7c3aed); }
-.sb-uname { font-size: 12px; font-weight: 600; color: var(--t1); line-height: 1.3; }
-.sb-urole { font-size: 9px; color: var(--t2); text-transform: uppercase; letter-spacing: 1px; }
-
-.sb-nav { flex: 1; padding: 10px 10px; overflow-y: auto; }
-.sb-sec { font-size: 9px; font-weight: 700; letter-spacing: 2px; color: var(--t3); text-transform: uppercase; padding: 12px 8px 5px; }
-.sb-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--r); cursor: pointer; color: var(--t2); font-size: 12px; font-weight: 500; transition: all 0.15s; margin-bottom: 2px; border: none; background: transparent; width: 100%; text-align: left; }
-.sb-item:hover { background: var(--s3); color: var(--t1); }
-.sb-item.active { background: rgba(79,158,255,0.1); color: var(--acc); border: 1px solid rgba(79,158,255,0.18); }
-.sb-item i { width: 16px; text-align: center; font-size: 12px; opacity: 0.8; }
-.sb-item.active i { opacity: 1; }
-.sb-badge { margin-left: auto; background: var(--acc); color: #000; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 10px; }
-.sb-footer { padding: 12px 10px; border-top: 1px solid var(--bdr); }
-.btn-logout { width: 100%; padding: 9px 12px; background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.2); border-radius: var(--r); color: var(--acc5); font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
-.btn-logout:hover { background: rgba(248,113,113,0.15); }
-
-/* ── MAIN ── */
-#main { margin-left: 220px; min-height: 100vh; }
-
-/* ── TOPBAR ── */
-.topbar { height: 54px; background: var(--s1); border-bottom: 1px solid var(--bdr); display: flex; align-items: center; padding: 0 24px; gap: 14px; position: sticky; top: 0; z-index: 40; }
-.topbar-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--t2); flex: 1; }
-.topbar-title span { color: var(--t1); }
-.topbar-actions { display: flex; align-items: center; gap: 8px; }
-
-/* ── CONTENT ── */
-.content { padding: 24px; max-width: 1300px; }
-.page { display: none; animation: fadeUp 0.25s ease; }
-.page.active { display: block; }
-@keyframes fadeUp { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
-
-/* ── PAGE HEADER ── */
-.ph { margin-bottom: 22px; display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-.ph h1 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: -0.3px; }
-.ph p { font-size: 12px; color: var(--t2); margin-top: 3px; }
-
-/* ── CARDS ── */
-.card { background: var(--s1); border: 1px solid var(--bdr); border-radius: var(--r2); padding: 20px; }
-.card-title { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--t3); margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
-
-/* ── STATS ── */
-.stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
-.stat { background: var(--s2); border: 1px solid var(--bdr); border-radius: var(--r); padding: 14px 16px; position: relative; overflow: hidden; }
-.stat::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; border-radius: 10px; }
-.stat.c1::before { background: var(--acc); } .stat.c2::before { background: var(--acc2); } .stat.c3::before { background: var(--acc3); } .stat.c4::before { background: var(--acc4); }
-.stat-v { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; line-height: 1; }
-.stat-l { font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--t3); margin-top: 4px; }
-
-/* ── BUTTONS ── */
-.btn { padding: 8px 16px; border-radius: var(--r); border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 12px; letter-spacing: 0.4px; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
-.btn-p { background: var(--acc); color: #fff; }
-.btn-p:hover { filter: brightness(1.1); transform: translateY(-1px); }
-.btn-g { background: transparent; color: var(--t2); border: 1px solid var(--bdr2); }
-.btn-g:hover { background: var(--s3); color: var(--t1); }
-.btn-d { background: rgba(248,113,113,0.1); color: var(--acc5); border: 1px solid rgba(248,113,113,0.25); }
-.btn-d:hover { background: rgba(248,113,113,0.2); }
-.btn-s { background: rgba(52,211,153,0.1); color: var(--acc3); border: 1px solid rgba(52,211,153,0.25); }
-.btn-e { background: rgba(79,158,255,0.1); color: var(--acc); border: 1px solid rgba(79,158,255,0.25); }
-.btn-e:hover { background: rgba(79,158,255,0.2); }
-.btn-sm { padding: 5px 12px; font-size: 11px; }
-.btn-xs { padding: 3px 8px; font-size: 10px; }
-
-/* ── FORM ── */
-.fg { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
-.fl { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--t3); }
-.fi, .fs { background: var(--s2); border: 1px solid var(--bdr); border-radius: var(--r); padding: 10px 12px; color: var(--t1); font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; transition: border-color 0.2s, background 0.2s; width: 100%; }
-.fi:focus, .fs:focus { border-color: rgba(79,158,255,0.4); background: var(--s3); }
-.fi::placeholder { color: var(--t4); }
-.fs option { background: var(--s2); }
-.fr { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
-
-/* ── RADIO BUTTONS ── */
-.radio-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.radio-opt { cursor: pointer; }
-.radio-opt input[type=radio] { display: none; }
-.radio-face { padding: 12px; border: 2px solid var(--bdr2); border-radius: var(--r2); text-align: center; font-size: 13px; font-weight: 600; color: var(--t2); transition: all 0.18s; }
-.radio-opt input:checked + .radio-face { border-color: var(--acc); background: rgba(79,158,255,0.08); color: var(--acc); }
-
-/* ── TABLE ── */
-.tw { overflow-x: auto; border-radius: var(--r); }
-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-th { background: var(--s2); padding: 10px 14px; text-align: left; font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--t3); font-weight: 700; border-bottom: 1px solid var(--bdr); white-space: nowrap; }
-td { padding: 10px 14px; border-bottom: 1px solid var(--bdr); color: var(--t1); vertical-align: middle; }
-tr:last-child td { border-bottom: none; }
-tr:hover td { background: rgba(255,255,255,0.015); }
-
-/* ── BADGES ── */
-.badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 20px; font-size: 9px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
-.b-ws { background: rgba(79,158,255,0.12); color: var(--acc); border: 1px solid rgba(79,158,255,0.2); }
-.b-ex { background: rgba(248,113,113,0.12); color: var(--acc5); border: 1px solid rgba(248,113,113,0.2); }
-.b-done { background: rgba(52,211,153,0.12); color: var(--acc3); border: 1px solid rgba(52,211,153,0.2); }
-.b-pend { background: rgba(251,191,36,0.12); color: var(--acc4); border: 1px solid rgba(251,191,36,0.2); }
-.b-bio { background: rgba(34,211,238,0.12); color: var(--bio); }
-.b-chm { background: rgba(167,139,250,0.12); color: var(--chm); }
-.b-phy { background: rgba(251,146,60,0.12); color: var(--phy); }
-.b-mth { background: rgba(74,222,128,0.12); color: var(--mth); }
-
-/* ── GRID ── */
-.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
-.g13 { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; }
-@media (max-width: 1024px) { .g2, .g3, .g13 { grid-template-columns: 1fr; } }
-
-/* ── PROFILE CARDS ── */
-.mentor-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
-.mentor-card { background: var(--s2); border: 1px solid var(--bdr); border-radius: var(--r2); padding: 20px; text-align: center; transition: all 0.2s; }
-.mentor-card:hover { border-color: rgba(79,158,255,0.2); transform: translateY(-2px); }
-.mc-avatar { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--acc), var(--acc2)); display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; color: #fff; margin: 0 auto 12px; }
-.mc-name { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--t1); margin-bottom: 4px; }
-.mc-role { font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--acc); background: rgba(79,158,255,0.08); padding: 3px 10px; border-radius: 20px; display: inline-block; margin-bottom: 14px; }
-.mc-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.mc-stat { background: var(--s1); border: 1px solid var(--bdr); border-radius: var(--r); padding: 8px; }
-.mc-stat-v { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; color: var(--t1); }
-.mc-stat-l { font-size: 8px; color: var(--t3); text-transform: uppercase; letter-spacing: 1px; }
-.mc-subj { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; margin-top: 10px; }
-
-/* ── MODAL ── */
-.mo { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 16px; animation: fadeUp 0.2s ease; }
-.mo.hidden { display: none; }
-.md { background: var(--s1); border: 1px solid var(--bdr2); border-radius: var(--r2); padding: 24px; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; }
-.mh { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-.mh h3 { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
-.cx { background: transparent; border: none; color: var(--t2); cursor: pointer; font-size: 18px; padding: 4px 8px; border-radius: 6px; }
-.cx:hover { background: var(--s3); color: var(--t1); }
-
-/* ── TOAST ── */
-#toasts { position: fixed; bottom: 20px; right: 20px; z-index: 300; display: flex; flex-direction: column; gap: 8px; }
-.toast { background: var(--s3); border: 1px solid var(--bdr2); border-radius: var(--r); padding: 11px 16px; font-size: 12px; font-weight: 500; display: flex; align-items: center; gap: 8px; animation: tsIn 0.3s ease; max-width: 280px; pointer-events: none; }
-.toast.ok { border-color: rgba(52,211,153,0.35); color: var(--acc3); }
-.toast.er { border-color: rgba(248,113,113,0.35); color: var(--acc5); }
-.toast.wa { border-color: rgba(251,191,36,0.35); color: var(--acc4); }
-@keyframes tsIn { from { opacity:0; transform:translateX(16px); } to { opacity:1; transform:translateX(0); } }
-
-/* ── EMPTY ── */
-.empty { text-align: center; padding: 48px 24px; color: var(--t3); }
-.empty i { font-size: 32px; margin-bottom: 12px; display: block; }
-.empty p { font-size: 13px; }
-
-/* ── SEARCH ── */
-.sw { position: relative; }
-.sw input { background: var(--s2); border: 1px solid var(--bdr); border-radius: var(--r); padding: 8px 12px 8px 32px; color: var(--t1); font-size: 12px; outline: none; width: 100%; transition: border-color 0.2s; font-family: 'DM Sans', sans-serif; }
-.sw input:focus { border-color: rgba(79,158,255,0.3); }
-.sw i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--t3); font-size: 12px; pointer-events: none; }
-
-/* ── FILTER CHIPS ── */
-.filter-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
-.chip { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; background: var(--s3); border: 1px solid var(--bdr); color: var(--t2); cursor: pointer; transition: all 0.15s; }
-.chip.on { background: rgba(79,158,255,0.1); border-color: rgba(79,158,255,0.3); color: var(--acc); }
-
-/* ── OWNER INDICATOR ── */
-.owner-tag { display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border-radius: 20px; font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; background: rgba(167,139,250,0.1); border: 1px solid rgba(167,139,250,0.25); color: var(--acc2); }
-
-/* ── PROGRESS BARS ── */
-.pbar { background: var(--s4); border-radius: 3px; height: 5px; overflow: hidden; margin-top: 6px; }
-.pfill { height: 100%; border-radius: 3px; transition: width 0.7s cubic-bezier(0.4,0,0.2,1); }
-
-/* ── SEPARATOR ── */
-.sep { height: 1px; background: var(--bdr); margin: 16px 0; }
-
-/* ── RESPONSIVE ── */
-@media (max-width: 768px) {
-  #sidebar { transform: translateX(-100%); }
-  #sidebar.open { transform: translateX(0); }
-  #main { margin-left: 0; }
-  .topbar { padding: 0 16px; }
-  .content { padding: 16px; }
-  .hamburger { display: flex !important; }
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);overflow-x:hidden;}
+#authGuard{display:none;position:fixed;inset:0;z-index:9999;background:var(--bg);align-items:center;justify-content:center;flex-direction:column;gap:16px;}
+#authGuard.show{display:flex;}
+.guard-icon{font-size:40px;color:var(--acc5);}
+.guard-text{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;}
+.guard-sub{font-size:13px;color:var(--t2);}
+#loadingOverlay{display:none;position:fixed;inset:0;z-index:8000;background:var(--bg);align-items:center;justify-content:center;flex-direction:column;gap:14px;}
+#loadingOverlay.show{display:flex;}
+.loader-ring{width:40px;height:40px;border:3px solid var(--s4);border-top-color:var(--acc);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader-text{font-size:12px;color:var(--t2);font-weight:500;}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--s4);border-radius:4px}
+#sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--s1);border-right:1px solid var(--bdr);display:flex;flex-direction:column;z-index:50;transition:transform .3s;}
+.sb-logo{padding:20px 18px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:10px;}
+.sb-logo-fb{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--acc),var(--acc2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:12px;font-weight:800;color:#fff;flex-shrink:0;box-shadow:0 4px 14px rgba(79,158,255,.25);}
+.sb-brand{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;letter-spacing:2px;color:var(--t1);line-height:1.3;}
+.sb-brand small{display:block;font-size:9px;color:var(--acc);font-weight:600;letter-spacing:1.5px;text-transform:uppercase;}
+.sb-user{padding:12px 14px;border-bottom:1px solid var(--bdr);}
+.sb-user-inner{background:var(--s2);border:1px solid var(--bdr2);border-radius:var(--r2);padding:10px 12px;display:flex;align-items:center;gap:10px;}
+.sb-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--acc),var(--acc2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:12px;font-weight:800;color:#fff;flex-shrink:0;}
+.sb-avatar.owner{background:linear-gradient(135deg,var(--acc2),#7c3aed);}
+.sb-uname{font-size:12px;font-weight:600;color:var(--t1);line-height:1.3;}
+.sb-urole{font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:1px;}
+.sb-nav{flex:1;padding:10px;overflow-y:auto;}
+.sb-sec{font-size:9px;font-weight:700;letter-spacing:2px;color:var(--t3);text-transform:uppercase;padding:12px 8px 5px;}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r);cursor:pointer;color:var(--t2);font-size:12px;font-weight:500;transition:all .15s;margin-bottom:2px;border:none;background:transparent;width:100%;text-align:left;}
+.sb-item:hover{background:var(--s3);color:var(--t1);}
+.sb-item.active{background:rgba(79,158,255,.1);color:var(--acc);border:1px solid rgba(79,158,255,.18);}
+.sb-item i{width:16px;text-align:center;font-size:12px;opacity:.8;}
+.sb-item.active i{opacity:1;}
+.sb-badge{margin-left:auto;background:var(--acc);color:#000;font-size:9px;font-weight:800;padding:2px 6px;border-radius:10px;}
+.sb-footer{padding:12px 10px;border-top:1px solid var(--bdr);}
+.btn-logout{width:100%;padding:9px 12px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:var(--r);color:var(--acc5);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .2s;}
+.btn-logout:hover{background:rgba(248,113,113,.15);}
+#main{margin-left:220px;min-height:100vh;}
+.topbar{height:54px;background:var(--s1);border-bottom:1px solid var(--bdr);display:flex;align-items:center;padding:0 24px;gap:14px;position:sticky;top:0;z-index:40;}
+.topbar-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t2);flex:1;}
+.topbar-title span{color:var(--t1);}
+.topbar-actions{display:flex;align-items:center;gap:8px;}
+.content{padding:24px;max-width:1300px;}
+.page{display:none;animation:fadeUp .25s ease;}
+.page.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.ph{margin-bottom:22px;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.ph h1{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-.3px;}
+.ph p{font-size:12px;color:var(--t2);margin-top:3px;}
+.card{background:var(--s1);border:1px solid var(--bdr);border-radius:var(--r2);padding:20px;}
+.card-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--t3);margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;}
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;}
+.stat{background:var(--s2);border:1px solid var(--bdr);border-radius:var(--r);padding:14px 16px;position:relative;overflow:hidden;}
+.stat::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:10px;}
+.stat.c1::before{background:var(--acc)}.stat.c2::before{background:var(--acc2)}.stat.c3::before{background:var(--acc3)}.stat.c4::before{background:var(--acc4)}
+.stat-v{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;line-height:1;}
+.stat-l{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);margin-top:4px;}
+.btn{padding:8px 16px;border-radius:var(--r);border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;font-size:12px;letter-spacing:.4px;transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
+.btn-p{background:var(--acc);color:#fff}.btn-p:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.btn-g{background:transparent;color:var(--t2);border:1px solid var(--bdr2)}.btn-g:hover{background:var(--s3);color:var(--t1)}
+.btn-d{background:rgba(248,113,113,.1);color:var(--acc5);border:1px solid rgba(248,113,113,.25)}.btn-d:hover{background:rgba(248,113,113,.2)}
+.btn-s{background:rgba(52,211,153,.1);color:var(--acc3);border:1px solid rgba(52,211,153,.25)}
+.btn-e{background:rgba(79,158,255,.1);color:var(--acc);border:1px solid rgba(79,158,255,.25)}.btn-e:hover{background:rgba(79,158,255,.2)}
+.btn-sm{padding:5px 12px;font-size:11px}.btn-xs{padding:3px 8px;font-size:10px}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+.fl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);}
+.fi,.fs{background:var(--s2);border:1px solid var(--bdr);border-radius:var(--r);padding:10px 12px;color:var(--t1);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color .2s,background .2s;width:100%;}
+.fi:focus,.fs:focus{border-color:rgba(79,158,255,.4);background:var(--s3);}
+.fi::placeholder{color:var(--t4)}.fs option{background:var(--s2)}
+.fr{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;}
+.radio-group{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.radio-opt{cursor:pointer}.radio-opt input[type=radio]{display:none}
+.radio-face{padding:12px;border:2px solid var(--bdr2);border-radius:var(--r2);text-align:center;font-size:13px;font-weight:600;color:var(--t2);transition:all .18s;}
+.radio-opt input:checked+.radio-face{border-color:var(--acc);background:rgba(79,158,255,.08);color:var(--acc);}
+.tw{overflow-x:auto;border-radius:var(--r);}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{background:var(--s2);padding:10px 14px;text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--t3);font-weight:700;border-bottom:1px solid var(--bdr);white-space:nowrap;}
+td{padding:10px 14px;border-bottom:1px solid var(--bdr);color:var(--t1);vertical-align:middle;}
+tr:last-child td{border-bottom:none}tr:hover td{background:rgba(255,255,255,.015)}
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;}
+.b-ws{background:rgba(79,158,255,.12);color:var(--acc);border:1px solid rgba(79,158,255,.2)}
+.b-ex{background:rgba(248,113,113,.12);color:var(--acc5);border:1px solid rgba(248,113,113,.2)}
+.b-done{background:rgba(52,211,153,.12);color:var(--acc3);border:1px solid rgba(52,211,153,.2)}
+.b-pend{background:rgba(251,191,36,.12);color:var(--acc4);border:1px solid rgba(251,191,36,.2)}
+.b-bio{background:rgba(34,211,238,.12);color:var(--bio)}
+.b-chm{background:rgba(167,139,250,.12);color:var(--chm)}
+.b-phy{background:rgba(251,146,60,.12);color:var(--phy)}
+.b-mth{background:rgba(74,222,128,.12);color:var(--mth)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.g13{display:grid;grid-template-columns:1.4fr 1fr;gap:16px}
+@media(max-width:1024px){.g2,.g3,.g13{grid-template-columns:1fr}}
+.mentor-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.mentor-card{background:var(--s2);border:1px solid var(--bdr);border-radius:var(--r2);padding:20px;text-align:center;transition:all .2s}
+.mentor-card:hover{border-color:rgba(79,158,255,.2);transform:translateY(-2px)}
+.mc-avatar{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#fff;margin:0 auto 12px}
+.mc-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:4px}
+.mc-role{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--acc);background:rgba(79,158,255,.08);padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:14px}
+.mc-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mc-stat{background:var(--s1);border:1px solid var(--bdr);border-radius:var(--r);padding:8px}
+.mc-stat-v{font-family:'Syne',sans-serif;font-size:18px;font-weight:800}
+.mc-stat-l{font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:1px}
+.mc-subj{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;margin-top:10px}
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;animation:fadeUp .2s ease}
+.mo.hidden{display:none}
+.md{background:var(--s1);border:1px solid var(--bdr2);border-radius:var(--r2);padding:24px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto}
+.mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.mh h3{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+.cx{background:transparent;border:none;color:var(--t2);cursor:pointer;font-size:18px;padding:4px 8px;border-radius:6px}
+.cx:hover{background:var(--s3);color:var(--t1)}
+#toasts{position:fixed;bottom:20px;right:20px;z-index:300;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--s3);border:1px solid var(--bdr2);border-radius:var(--r);padding:11px 16px;font-size:12px;font-weight:500;display:flex;align-items:center;gap:8px;animation:tsIn .3s ease;max-width:280px;pointer-events:none}
+.toast.ok{border-color:rgba(52,211,153,.35);color:var(--acc3)}
+.toast.er{border-color:rgba(248,113,113,.35);color:var(--acc5)}
+.toast.wa{border-color:rgba(251,191,36,.35);color:var(--acc4)}
+@keyframes tsIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+.empty{text-align:center;padding:48px 24px;color:var(--t3)}
+.empty i{font-size:32px;margin-bottom:12px;display:block}
+.empty p{font-size:13px}
+.sw{position:relative}
+.sw input{background:var(--s2);border:1px solid var(--bdr);border-radius:var(--r);padding:8px 12px 8px 32px;color:var(--t1);font-size:12px;outline:none;width:100%;transition:border-color .2s;font-family:'DM Sans',sans-serif}
+.sw input:focus{border-color:rgba(79,158,255,.3)}
+.sw i{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t3);font-size:12px;pointer-events:none}
+.filter-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.chip{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;background:var(--s3);border:1px solid var(--bdr);color:var(--t2);cursor:pointer;transition:all .15s}
+.chip.on{background:rgba(79,158,255,.1);border-color:rgba(79,158,255,.3);color:var(--acc)}
+.pbar{background:var(--s4);border-radius:3px;height:5px;overflow:hidden;margin-top:6px}
+.pfill{height:100%;border-radius:3px;transition:width .7s cubic-bezier(.4,0,.2,1)}
+@media(max-width:768px){
+  #sidebar{transform:translateX(-100%)}
+  #sidebar.open{transform:translateX(0)}
+  #main{margin-left:0}
+  .topbar{padding:0 16px}
+  .content{padding:16px}
+  .hamburger{display:flex!important}
 }
-.hamburger { display: none; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--bdr); background: transparent; color: var(--t2); cursor: pointer; font-size: 14px; }
+.hamburger{display:none;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid var(--bdr);background:transparent;color:var(--t2);cursor:pointer;font-size:14px}
 </style>
 </head>
 <body>
@@ -237,13 +161,18 @@ tr:hover td { background: rgba(255,255,255,0.015); }
   <div class="guard-sub">Redirecting to login…</div>
 </div>
 
+<!-- LOADING -->
+<div id="loadingOverlay" class="show">
+  <div class="loader-ring"></div>
+  <div class="loader-text">Connecting to Firebase…</div>
+</div>
+
 <!-- SIDEBAR -->
 <nav id="sidebar">
   <div class="sb-logo">
     <div class="sb-logo-fb">CR</div>
     <div class="sb-brand">CRISPR<small>Learning</small></div>
   </div>
-
   <div class="sb-user">
     <div class="sb-user-inner">
       <div class="sb-avatar" id="sbAvatar">?</div>
@@ -253,20 +182,16 @@ tr:hover td { background: rgba(255,255,255,0.015); }
       </div>
     </div>
   </div>
-
   <div class="sb-nav">
     <div class="sb-sec">Overview</div>
     <button class="sb-item active" onclick="nav('dashboard',this)"><i class="fa-solid fa-grid-2"></i> Dashboard</button>
-
     <div class="sb-sec">Work Log</div>
     <button class="sb-item" onclick="nav('log',this)"><i class="fa-solid fa-pen-to-square"></i> Add Entry <span class="sb-badge" id="sbCount">0</span></button>
     <button class="sb-item" onclick="nav('all',this)"><i class="fa-solid fa-list"></i> All Logs</button>
-
     <div class="sb-sec">Analytics</div>
     <button class="sb-item" onclick="nav('reports',this)"><i class="fa-solid fa-chart-bar"></i> Performance</button>
     <button class="sb-item" onclick="nav('profiles',this)"><i class="fa-solid fa-users"></i> Mentor Profiles</button>
   </div>
-
   <div class="sb-footer">
     <button class="btn-logout" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
   </div>
@@ -281,18 +206,15 @@ tr:hover td { background: rgba(255,255,255,0.015); }
       <div class="sw" style="width:200px"><i class="fa-solid fa-magnifying-glass"></i><input type="text" placeholder="Search logs…" id="globalSearch" oninput="globalFilter()"></div>
     </div>
   </div>
-
   <div class="content">
 
     <!-- DASHBOARD -->
     <div class="page active" id="pg-dashboard">
-      <div class="ph">
-        <div><h1 id="dashGreet">Welcome back!</h1><p id="dashSub">Here's your activity overview</p></div>
-      </div>
+      <div class="ph"><div><h1 id="dashGreet">Welcome back!</h1><p id="dashSub">Here's your activity overview</p></div></div>
       <div class="stat-row" id="dashStats"></div>
       <div class="g2">
         <div class="card">
-          <div class="card-title">My Recent Logs <span id="myLogsToggle"></span></div>
+          <div class="card-title">Recent Logs</div>
           <div id="dashMyLogs"></div>
         </div>
         <div class="card">
@@ -304,48 +226,28 @@ tr:hover td { background: rgba(255,255,255,0.015); }
 
     <!-- ADD ENTRY -->
     <div class="page" id="pg-log">
-      <div class="ph">
-        <div><h1>Add Work Entry</h1><p id="logSubtitle">Log your daily work for the record.</p></div>
-      </div>
+      <div class="ph"><div><h1>Add Work Entry</h1><p id="logSubtitle">Log your daily work for the record.</p></div></div>
       <div class="g13">
         <div class="card">
           <div class="card-title">New Work Log</div>
           <div class="fg">
             <label class="fl">Task Category</label>
             <div class="radio-group">
-              <label class="radio-opt">
-                <input type="radio" name="workType" value="WORKSHEET" checked onchange="toggleChapter(true)">
-                <div class="radio-face"><i class="fa-solid fa-file-lines" style="margin-right:6px"></i>Worksheet</div>
-              </label>
-              <label class="radio-opt">
-                <input type="radio" name="workType" value="EXAM" onchange="toggleChapter(false)">
-                <div class="radio-face"><i class="fa-solid fa-clipboard-check" style="margin-right:6px"></i>Exam</div>
-              </label>
+              <label class="radio-opt"><input type="radio" name="workType" value="WORKSHEET" checked onchange="toggleChapter(true)"><div class="radio-face"><i class="fa-solid fa-file-lines" style="margin-right:6px"></i>Worksheet</div></label>
+              <label class="radio-opt"><input type="radio" name="workType" value="EXAM" onchange="toggleChapter(false)"><div class="radio-face"><i class="fa-solid fa-clipboard-check" style="margin-right:6px"></i>Exam</div></label>
             </div>
           </div>
+          <div id="ownerMentorSlot"></div>
           <div class="fr">
-            <div class="fg">
-              <label class="fl">Date</label>
-              <input type="date" class="fi" id="eDate" required>
-            </div>
-            <div class="fg">
-              <label class="fl">Subject</label>
+            <div class="fg"><label class="fl">Date</label><input type="date" class="fi" id="eDate" required></div>
+            <div class="fg"><label class="fl">Subject</label>
               <select class="fs" id="eSubject">
-                <option value="Biology">Biology</option>
-                <option value="Chemistry">Chemistry</option>
-                <option value="Physics">Physics</option>
-                <option value="Maths">Maths</option>
+                <option value="Biology">Biology</option><option value="Chemistry">Chemistry</option><option value="Physics">Physics</option><option value="Maths">Maths</option>
               </select>
             </div>
           </div>
-          <div class="fg" id="chapterWrap">
-            <label class="fl">Topic / Chapter</label>
-            <input type="text" class="fi" id="eChapter" placeholder="Enter topic or chapter name…">
-          </div>
-          <div class="fg">
-            <label class="fl">Notes (optional)</label>
-            <textarea class="fi" id="eNotes" rows="3" placeholder="Any remarks…" style="resize:vertical"></textarea>
-          </div>
+          <div class="fg" id="chapterWrap"><label class="fl">Topic / Chapter</label><input type="text" class="fi" id="eChapter" placeholder="Enter topic or chapter name…"></div>
+          <div class="fg"><label class="fl">Notes (optional)</label><textarea class="fi" id="eNotes" rows="3" placeholder="Any remarks…" style="resize:vertical"></textarea></div>
           <button class="btn btn-p" style="width:100%;justify-content:center;padding:13px" onclick="addEntry()"><i class="fa-solid fa-plus"></i> Submit Entry</button>
         </div>
         <div>
@@ -373,9 +275,7 @@ tr:hover td { background: rgba(255,255,255,0.015); }
 
     <!-- ALL LOGS -->
     <div class="page" id="pg-all">
-      <div class="ph">
-        <div><h1>All Work Logs</h1><p>Complete activity record</p></div>
-      </div>
+      <div class="ph"><div><h1>All Work Logs</h1><p>Complete activity record</p></div></div>
       <div class="card">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">
           <div class="filter-row" style="margin-bottom:0" id="filterChips"></div>
@@ -383,17 +283,7 @@ tr:hover td { background: rgba(255,255,255,0.015); }
         </div>
         <div class="tw">
           <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Mentor</th>
-                <th>Type</th>
-                <th>Subject</th>
-                <th>Topic</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
+            <thead><tr><th>Date</th><th>Mentor</th><th>Type</th><th>Subject</th><th>Topic</th><th>Status</th><th>Actions</th></tr></thead>
             <tbody id="allBody"></tbody>
           </table>
         </div>
@@ -427,42 +317,20 @@ tr:hover td { background: rgba(255,255,255,0.015); }
     <div class="fg">
       <label class="fl">Task Category</label>
       <div class="radio-group">
-        <label class="radio-opt">
-          <input type="radio" name="editType" value="WORKSHEET" onchange="toggleEditChapter(true)">
-          <div class="radio-face"><i class="fa-solid fa-file-lines" style="margin-right:6px"></i>Worksheet</div>
-        </label>
-        <label class="radio-opt">
-          <input type="radio" name="editType" value="EXAM" onchange="toggleEditChapter(false)">
-          <div class="radio-face"><i class="fa-solid fa-clipboard-check" style="margin-right:6px"></i>Exam</div>
-        </label>
+        <label class="radio-opt"><input type="radio" name="editType" value="WORKSHEET" onchange="toggleEditChapter(true)"><div class="radio-face"><i class="fa-solid fa-file-lines" style="margin-right:6px"></i>Worksheet</div></label>
+        <label class="radio-opt"><input type="radio" name="editType" value="EXAM" onchange="toggleEditChapter(false)"><div class="radio-face"><i class="fa-solid fa-clipboard-check" style="margin-right:6px"></i>Exam</div></label>
       </div>
     </div>
     <div class="fr">
-      <div class="fg">
-        <label class="fl">Date</label>
-        <input type="date" class="fi" id="editDate">
-      </div>
-      <div class="fg">
-        <label class="fl">Subject</label>
-        <select class="fs" id="editSubject">
-          <option>Biology</option><option>Chemistry</option><option>Physics</option><option>Maths</option>
-        </select>
+      <div class="fg"><label class="fl">Date</label><input type="date" class="fi" id="editDate"></div>
+      <div class="fg"><label class="fl">Subject</label>
+        <select class="fs" id="editSubject"><option>Biology</option><option>Chemistry</option><option>Physics</option><option>Maths</option></select>
       </div>
     </div>
-    <div class="fg" id="editChapterWrap">
-      <label class="fl">Topic / Chapter</label>
-      <input type="text" class="fi" id="editChapter" placeholder="Chapter or topic…">
-    </div>
-    <div class="fg">
-      <label class="fl">Notes</label>
-      <textarea class="fi" id="editNotes" rows="3" style="resize:vertical"></textarea>
-    </div>
-    <div class="fg">
-      <label class="fl">Status</label>
-      <select class="fs" id="editStatus">
-        <option value="false">Assigned / In Progress</option>
-        <option value="true">Completed</option>
-      </select>
+    <div class="fg" id="editChapterWrap"><label class="fl">Topic / Chapter</label><input type="text" class="fi" id="editChapter" placeholder="Chapter or topic…"></div>
+    <div class="fg"><label class="fl">Notes</label><textarea class="fi" id="editNotes" rows="3" style="resize:vertical"></textarea></div>
+    <div class="fg"><label class="fl">Status</label>
+      <select class="fs" id="editStatus"><option value="false">Assigned / In Progress</option><option value="true">Completed</option></select>
     </div>
     <div style="display:flex;gap:10px;margin-top:4px">
       <button class="btn btn-p" style="flex:1;justify-content:center" onclick="saveEdit()"><i class="fa-solid fa-check"></i> Save Changes</button>
@@ -471,7 +339,7 @@ tr:hover td { background: rgba(255,255,255,0.015); }
   </div>
 </div>
 
-<!-- DELETE CONFIRM MODAL -->
+<!-- DELETE MODAL -->
 <div class="mo hidden" id="deleteModal">
   <div class="md" style="max-width:400px;text-align:center">
     <div style="font-size:40px;margin-bottom:12px">🗑️</div>
@@ -485,537 +353,362 @@ tr:hover td { background: rgba(255,255,255,0.015); }
   </div>
 </div>
 
-<!-- TOASTS -->
 <div id="toasts"></div>
 
-<!-- ═══ FIREBASE SDK ═══ -->
+<!-- ═══ FIREBASE ═══ -->
 <script type="module">
-// ══════════════════════════════════════════════════════════════
-//  🔥 FIREBASE CONFIG — PASTE YOUR CONFIG HERE
-//  Get this from: Firebase Console → Project Settings → Your App
-// ══════════════════════════════════════════════════════════════
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, set, push, update, remove, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, set, push, update, remove, onValue }
+                            from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
+/* ── CONFIG ── */
 const firebaseConfig = {
-  apiKey: "AIzaSyC6uMtayGzkR0CPaIh-Cinxafv0Xc1QUXs",
-  authDomain: "crispr-mentor.firebaseapp.com",
-  databaseURL: "https://crispr-mentor-default-rtdb.firebaseio.com",
-  projectId: "crispr-mentor",
-  storageBucket: "crispr-mentor.firebasestorage.app",
+  apiKey:            "AIzaSyC6uMtayGzkR0CPaIh-Cinxafv0Xc1QUXs",
+  authDomain:        "crispr-mentor.firebaseapp.com",
+  databaseURL:       "https://crispr-mentor-default-rtdb.firebaseio.com",
+  projectId:         "crispr-mentor",
+  storageBucket:     "crispr-mentor.firebasestorage.app",
   messagingSenderId: "593880996314",
-  appId: "1:593880996314:web:7eb5269764cc09badf88e3",
-  measurementId: "G-TT655G8EQS"
+  appId:             "1:593880996314:web:7eb5269764cc09badf88e3",
+  measurementId:     "G-TT655G8EQS"
 };
 
-const app = initializeApp(firebaseConfig);
-const db  = getDatabase(app);
-const dbRef = ref(db, 'crispr_entries');
+const fbApp = initializeApp(firebaseConfig);
+const fbDB  = getDatabase(fbApp);
+const ROOT  = ref(fbDB, 'crispr_entries');
 
-// ══════════════════════════════════════
-//  SESSION & AUTH
-// ══════════════════════════════════════
-let SESSION = null;
-
-function checkAuth() {
-  const raw = localStorage.getItem('crispr_session');
-  if (!raw) { redirectLogin(); return; }
-  try {
-    const s = JSON.parse(raw);
-    if (!s || !s.name || !s.role) { redirectLogin(); return; }
-    // 8 hour session
-    if (Date.now() - s.time > 8 * 60 * 60 * 1000) { redirectLogin(); return; }
-    SESSION = s;
-    initApp();
-  } catch(e) { redirectLogin(); }
-}
-
-function redirectLogin() {
-  document.getElementById('authGuard').classList.add('show');
-  setTimeout(() => window.location.href = 'index.html', 1400);
-}
-
-function logout() {
-  localStorage.removeItem('crispr_session');
-  window.location.href = 'index.html';
-}
-
-// ══════════════════════════════════════
-//  DATA
-// ══════════════════════════════════════
-const MENTORS = ["AADISANKAR D","ABHISHITH S D","ADHIL","GAUTHAM THEJUR","HAN JOSEPH","ZAFIR"];
+/* ── CONSTANTS ── */
+const MENTORS  = ["AADISANKAR D","ABHISHITH S D","ADHIL","GAUTHAM THEJUR","HAN JOSEPH","ZAFIR"];
 const SUBJECTS = ["Biology","Chemistry","Physics","Maths"];
-const SUBJ_COLORS = { Biology: 'b-bio', Chemistry: 'b-chm', Physics: 'b-phy', Maths: 'b-mth' };
+const SUBJ_COLORS = { Biology:'b-bio', Chemistry:'b-chm', Physics:'b-phy', Maths:'b-mth' };
 const MENTOR_INFO = {
-  "AADISANKAR D":   { role: "Chemistry Mentor",  expertise: ["Chemistry","Biology"],   color: "#22d3ee" },
-  "ABHISHITH S D":  { role: "Mathematics Lead",  expertise: ["Maths"],                  color: "#a78bfa" },
-  "ADHIL":          { role: "Physics Mentor",     expertise: ["Physics"],                color: "#fb923c" },
-  "GAUTHAM THEJUR": { role: "Biology Mentor",     expertise: ["Biology"],                color: "#4ade80" },
-  "HAN JOSEPH":     { role: "Lead Educator",      expertise: ["Physics","Chemistry"],    color: "#4f9eff" },
-  "ZAFIR":          { role: "Maths Mentor",       expertise: ["Maths"],                  color: "#f59e0b" }
+  "AADISANKAR D":   { role:"Chemistry Mentor",  expertise:["Chemistry","Biology"],  color:"#22d3ee" },
+  "ABHISHITH S D":  { role:"Mathematics Lead",  expertise:["Maths"],                color:"#a78bfa" },
+  "ADHIL":          { role:"Physics Mentor",    expertise:["Physics"],              color:"#fb923c" },
+  "GAUTHAM THEJUR": { role:"Biology Mentor",    expertise:["Biology"],              color:"#4ade80" },
+  "HAN JOSEPH":     { role:"Lead Educator",     expertise:["Physics","Chemistry"],  color:"#4f9eff" },
+  "ZAFIR":          { role:"Maths Mentor",      expertise:["Maths"],                color:"#f59e0b" }
 };
+const SCOL = { Biology:'#22d3ee', Chemistry:'#a78bfa', Physics:'#fb923c', Maths:'#4ade80' };
 
-let DB = [];
-let filterMentor = 'all';
-let _dbLoaded = false;
+/* ── STATE ── */
+let SESSION = null, DB = [], filterMentor = 'all';
 
-// ── FIREBASE REAL-TIME LISTENER ──
-// Keeps DB in sync with Firestore across all users/tabs
-function startFirebaseListener() {
-  onValue(dbRef, snapshot => {
-    const data = snapshot.val();
-    DB = data ? Object.entries(data).map(([fbKey, entry]) => ({ ...entry, _fbKey: fbKey })) : [];
-    _dbLoaded = true;
-    updateCount();
-    renderDashboard();
-    renderAll();
+/* ── HELPERS ── */
+const $  = id => document.getElementById(id);
+function toast(msg, type='ok'){
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  const ic = {ok:'fa-circle-check',er:'fa-circle-xmark',wa:'fa-triangle-exclamation'};
+  el.innerHTML = `<i class="fa-solid ${ic[type]||ic.ok}"></i> ${msg}`;
+  $('toasts').appendChild(el);
+  setTimeout(()=>el.remove(), 3200);
+}
+
+/* ── AUTH ── */
+function checkAuth(){
+  const raw = localStorage.getItem('crispr_session');
+  if(!raw){ return redirectLogin(); }
+  try{
+    const s = JSON.parse(raw);
+    if(!s||!s.name||!s.role){ return redirectLogin(); }
+    if(Date.now()-s.time > 8*3600*1000){ return redirectLogin(); }
+    SESSION = s; initApp();
+  }catch(e){ redirectLogin(); }
+}
+function redirectLogin(){
+  $('loadingOverlay').classList.remove('show');
+  $('authGuard').classList.add('show');
+  setTimeout(()=>window.location.href='index.html', 1400);
+}
+window.logout = ()=>{ localStorage.removeItem('crispr_session'); window.location.href='index.html'; };
+
+/* ── FIREBASE OPS ── */
+async function fbAdd(e){ const r=push(ROOT); await set(r,e); }
+async function fbSet(key,data){ await update(ref(fbDB,`crispr_entries/${key}`),data); }
+async function fbDel(key){ await remove(ref(fbDB,`crispr_entries/${key}`)); }
+
+function startListener(){
+  onValue(ROOT, snap=>{
+    const d = snap.val();
+    DB = d ? Object.entries(d).map(([k,v])=>({...v,_fbKey:k})) : [];
+    $('loadingOverlay').classList.remove('show');
+    updateCount(); renderDashboard(); renderAll();
+    if($('pg-reports').classList.contains('active'))  renderReports();
+    if($('pg-profiles').classList.contains('active')) renderProfiles();
   });
 }
 
-// ── WRITE HELPERS ──
-async function fbAddEntry(entry) {
-  const newRef = push(dbRef);
-  await set(newRef, entry);
-}
-
-async function fbUpdateEntry(fbKey, updatedEntry) {
-  const entryRef = ref(db, `crispr_entries/${fbKey}`);
-  await update(entryRef, updatedEntry);
-}
-
-async function fbDeleteEntry(fbKey) {
-  const entryRef = ref(db, `crispr_entries/${fbKey}`);
-  await remove(entryRef);
-}
-
-// ══════════════════════════════════════
-//  INIT
-// ══════════════════════════════════════
-function initApp() {
-  // Set sidebar user info
-  const av = document.getElementById('sbAvatar');
+/* ── INIT ── */
+function initApp(){
+  const av = $('sbAvatar');
   av.textContent = SESSION.name.charAt(0);
-  if (SESSION.role === 'owner') av.classList.add('owner');
-  document.getElementById('sbName').textContent = SESSION.name;
-  document.getElementById('sbRole').textContent = SESSION.role === 'owner' ? '👑 Owner' : 'Mentor';
-  document.getElementById('loggedAs').textContent = SESSION.name.charAt(0);
-  document.getElementById('loggedAs').className = 'sb-avatar' + (SESSION.role === 'owner' ? ' owner' : '');
-  document.getElementById('loggedAsName').textContent = SESSION.name;
-  document.getElementById('loggedAsRole').textContent = SESSION.role === 'owner' ? 'Owner — Full Access' : 'Mentor — Own Logs Only';
+  if(SESSION.role==='owner') av.classList.add('owner');
+  $('sbName').textContent    = SESSION.name;
+  $('sbRole').textContent    = SESSION.role==='owner'?'👑 Owner':'Mentor';
+  $('loggedAs').textContent  = SESSION.name.charAt(0);
+  $('loggedAs').className    = 'sb-avatar'+(SESSION.role==='owner'?' owner':'');
+  $('loggedAsName').textContent = SESSION.name;
+  $('loggedAsRole').textContent = SESSION.role==='owner'?'Owner — Full Access':'Mentor — Own Logs Only';
+  $('eDate').value = new Date().toISOString().split('T')[0];
 
-  // Set default date
-  document.getElementById('eDate').value = new Date().toISOString().split('T')[0];
-
-  // Owner hint in log subtitle
-  if (SESSION.role === 'owner') {
-    document.getElementById('logSubtitle').textContent = 'As owner, you can add entries for any mentor.';
-    // Add mentor selector for owner
-    const wrap = document.getElementById('chapterWrap');
-    const sel = `<div class="fg" id="ownerMentorWrap" style="margin-bottom:14px">
-      <label class="fl">Logging for Mentor</label>
-      <select class="fs" id="eMentor">
-        ${MENTORS.map(m=>`<option value="${m}">${m}</option>`).join('')}
-      </select>
-    </div>`;
-    wrap.insertAdjacentHTML('beforebegin', sel);
+  if(SESSION.role==='owner'){
+    $('logSubtitle').textContent = 'As owner, you can add entries for any mentor.';
+    $('ownerMentorSlot').innerHTML = `
+      <div class="fg" style="margin-bottom:14px">
+        <label class="fl">Logging for Mentor</label>
+        <select class="fs" id="eMentor">${MENTORS.map(m=>`<option value="${m}">${m}</option>`).join('')}</select>
+      </div>`;
   }
-
   buildFilterChips();
-  startFirebaseListener(); // This replaces the old manual renders — Firebase listener handles it
+  startListener();
 }
 
-// ══════════════════════════════════════
-//  NAVIGATION
-// ══════════════════════════════════════
-function nav(page, el) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
-  document.getElementById('pg-' + page).classList.add('active');
-  if (el) el.classList.add('active');
+/* ── NAV ── */
+window.nav = function(page, el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
+  $('pg-'+page).classList.add('active');
+  if(el) el.classList.add('active');
+  const t={dashboard:'Dashboard',log:'Add Entry',all:'All Logs',reports:'Performance',profiles:'Profiles'};
+  $('topbarTitle').innerHTML=`<span>${t[page]||page}</span>`;
+  if(page==='reports')  renderReports();
+  if(page==='profiles') renderProfiles();
+  $('sidebar').classList.remove('open');
+};
+window.toggleSidebar = ()=>$('sidebar').classList.toggle('open');
 
-  const titles = { dashboard: 'Dashboard', log: 'Add Entry', all: 'All Logs', reports: 'Performance', profiles: 'Profiles' };
-  document.getElementById('topbarTitle').innerHTML = `<span>${titles[page] || page}</span>`;
-
-  if (page === 'reports')  renderReports();
-  if (page === 'profiles') renderProfiles();
-
-  // Close sidebar on mobile
-  document.getElementById('sidebar').classList.remove('open');
-}
-
-function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
-
-// ══════════════════════════════════════
-//  TOAST
-// ══════════════════════════════════════
-function toast(msg, type='ok') {
-  const el = document.createElement('div');
-  el.className = `toast ${type}`;
-  const icons = { ok: 'fa-circle-check', er: 'fa-circle-xmark', wa: 'fa-triangle-exclamation' };
-  el.innerHTML = `<i class="fa-solid ${icons[type]||icons.ok}"></i> ${msg}`;
-  document.getElementById('toasts').appendChild(el);
-  setTimeout(() => el.remove(), 3200);
-}
-
-// ══════════════════════════════════════
-//  ENTRY CRUD
-// ══════════════════════════════════════
-async function addEntry() {
-  const type    = document.querySelector('input[name="workType"]:checked').value;
-  const date    = document.getElementById('eDate').value;
-  const subject = document.getElementById('eSubject').value;
-  const chapter = type === 'WORKSHEET' ? (document.getElementById('eChapter').value.trim() || 'General') : 'Exam';
-  const notes   = document.getElementById('eNotes').value.trim();
-  const mentor  = SESSION.role === 'owner'
-                    ? document.getElementById('eMentor').value
-                    : SESSION.name;
-
-  if (!date) { toast('Please select a date.', 'er'); return; }
-
-  const entry = { id: Date.now(), mentor, type, date, subject, chapter, notes, completed: false, createdBy: SESSION.name };
-
-  try {
-    await fbAddEntry(entry);
+/* ── CRUD ── */
+window.addEntry = async function(){
+  const typeEl = document.querySelector('input[name="workType"]:checked');
+  if(!typeEl){ toast('Select a task type.','er'); return; }
+  const type    = typeEl.value;
+  const date    = $('eDate').value;
+  const subject = $('eSubject').value;
+  const chapter = type==='WORKSHEET'?($('eChapter').value.trim()||'General'):'Exam';
+  const notes   = $('eNotes').value.trim();
+  const mentor  = SESSION.role==='owner' ? $('eMentor').value : SESSION.name;
+  if(!date){ toast('Please select a date.','er'); return; }
+  const entry = {id:Date.now(),mentor,type,date,subject,chapter,notes,completed:false,createdBy:SESSION.name};
+  try{
+    await fbAdd(entry);
     toast('Work entry added!');
-    // Reset form
-    document.getElementById('eDate').value = new Date().toISOString().split('T')[0];
-    document.getElementById('eChapter').value = '';
-    document.getElementById('eNotes').value = '';
-  } catch(err) {
-    toast('Failed to save. Check your connection.', 'er');
-    console.error(err);
-  }
-}
+    $('eDate').value    = new Date().toISOString().split('T')[0];
+    $('eChapter').value = '';
+    $('eNotes').value   = '';
+  }catch(err){ toast('Failed to save. Check your connection.','er'); console.error(err); }
+};
 
-function canEdit(entry) {
-  if (SESSION.role === 'owner') return true;
-  return entry.mentor === SESSION.name;
-}
+function canEdit(e){ return SESSION.role==='owner'||e.mentor===SESSION.name; }
+function canDelete(e){ return SESSION.role==='owner'; }
 
-function canDelete(entry) {
-  return SESSION.role === 'owner';
-}
+window.openEdit = function(id){
+  const e = DB.find(x=>x.id===id);
+  if(!e) return;
+  if(!canEdit(e)){ toast('You can only edit your own entries.','er'); return; }
+  $('editId').value    = id;
+  const ti = document.querySelector(`input[name="editType"][value="${e.type}"]`);
+  if(ti) ti.checked   = true;
+  $('editDate').value    = e.date;
+  $('editSubject').value = e.subject;
+  $('editChapter').value = e.chapter||'';
+  $('editNotes').value   = e.notes||'';
+  $('editStatus').value  = String(e.completed);
+  toggleEditChapter(e.type==='WORKSHEET');
+  $('editModal').classList.remove('hidden');
+};
 
-function openEdit(id) {
-  const e = DB.find(x => x.id === id);
-  if (!e) return;
-  if (!canEdit(e)) { toast('You can only edit your own entries.', 'er'); return; }
-
-  document.getElementById('editId').value = id;
-  document.querySelector(`input[name="editType"][value="${e.type}"]`).checked = true;
-  document.getElementById('editDate').value    = e.date;
-  document.getElementById('editSubject').value = e.subject;
-  document.getElementById('editChapter').value = e.chapter || '';
-  document.getElementById('editNotes').value   = e.notes || '';
-  document.getElementById('editStatus').value  = String(e.completed);
-  toggleEditChapter(e.type === 'WORKSHEET');
-  document.getElementById('editModal').classList.remove('hidden');
-}
-
-async function saveEdit() {
-  const id = Number(document.getElementById('editId').value);
-  const e = DB.find(x => x.id === id);
-  if (!e) return;
-  if (!canEdit(e)) { toast('Permission denied.', 'er'); return; }
-
-  const type = document.querySelector('input[name="editType"]:checked').value;
-  const updated = {
-    ...e,
-    type,
-    date:      document.getElementById('editDate').value,
-    subject:   document.getElementById('editSubject').value,
-    chapter:   type === 'WORKSHEET' ? document.getElementById('editChapter').value.trim() : 'Exam',
-    notes:     document.getElementById('editNotes').value.trim(),
-    completed: document.getElementById('editStatus').value === 'true',
+window.saveEdit = async function(){
+  const id = Number($('editId').value);
+  const e  = DB.find(x=>x.id===id);
+  if(!e) return;
+  if(!canEdit(e)){ toast('Permission denied.','er'); return; }
+  const ti = document.querySelector('input[name="editType"]:checked');
+  if(!ti) return;
+  const type = ti.value;
+  const {_fbKey,...clean} = {
+    ...e, type,
+    date:      $('editDate').value,
+    subject:   $('editSubject').value,
+    chapter:   type==='WORKSHEET'?$('editChapter').value.trim():'Exam',
+    notes:     $('editNotes').value.trim(),
+    completed: $('editStatus').value==='true',
     editedAt:  Date.now(), editedBy: SESSION.name
   };
-  const { _fbKey, ...entryWithoutKey } = updated;
+  try{ await fbSet(e._fbKey,clean); toast('Entry updated!'); closeModal(); }
+  catch(err){ toast('Failed to update.','er'); console.error(err); }
+};
 
-  try {
-    await fbUpdateEntry(e._fbKey, entryWithoutKey);
-    toast('Entry updated!');
-    closeModal();
-  } catch(err) {
-    toast('Failed to update. Check your connection.', 'er');
-    console.error(err);
-  }
-}
+window.openDelete = function(id){
+  const e = DB.find(x=>x.id===id);
+  if(!e) return;
+  if(!canDelete(e)){ toast('Only the owner can delete entries.','er'); return; }
+  $('deleteId').value = id;
+  $('deleteModal').classList.remove('hidden');
+};
 
-function openDelete(id) {
-  const e = DB.find(x => x.id === id);
-  if (!e) return;
-  if (!canDelete(e)) { toast('Only the owner can delete entries.', 'er'); return; }
-  document.getElementById('deleteId').value = id;
-  document.getElementById('deleteModal').classList.remove('hidden');
-}
+window.confirmDelete = async function(){
+  const id = Number($('deleteId').value);
+  const e  = DB.find(x=>x.id===id);
+  if(!e) return;
+  try{ await fbDel(e._fbKey); toast('Entry deleted.','wa'); closeDeleteModal(); }
+  catch(err){ toast('Failed to delete.','er'); console.error(err); }
+};
 
-async function confirmDelete() {
-  const id = Number(document.getElementById('deleteId').value);
-  const e = DB.find(x => x.id === id);
-  if (!e) return;
+window.markComplete = async function(id){
+  const e = DB.find(x=>x.id===id);
+  if(!e||!canEdit(e)){ toast('Permission denied.','er'); return; }
+  const {_fbKey,...clean} = {...e,completed:true};
+  try{ await fbSet(e._fbKey,clean); toast('Marked as completed!'); }
+  catch(err){ toast('Failed to update.','er'); }
+};
 
-  try {
-    await fbDeleteEntry(e._fbKey);
-    toast('Entry deleted.', 'wa');
-    closeDeleteModal();
-  } catch(err) {
-    toast('Failed to delete. Check your connection.', 'er');
-    console.error(err);
-  }
-}
+window.closeModal       = ()=>$('editModal').classList.add('hidden');
+window.closeDeleteModal = ()=>$('deleteModal').classList.add('hidden');
+window.toggleChapter     = show=>$('chapterWrap').style.display=show?'':'none';
+window.toggleEditChapter = show=>$('editChapterWrap').style.display=show?'':'none';
 
-async function markComplete(id) {
-  const e = DB.find(x => x.id === id);
-  if (!e || !canEdit(e)) { toast('Permission denied.', 'er'); return; }
-  const { _fbKey, ...entryWithoutKey } = { ...e, completed: true };
-  try {
-    await fbUpdateEntry(e._fbKey, entryWithoutKey);
-    toast('Marked as completed!');
-  } catch(err) {
-    toast('Failed to update. Check your connection.', 'er');
-  }
-}
-
-function closeModal()       { document.getElementById('editModal').classList.add('hidden'); }
-function closeDeleteModal() { document.getElementById('deleteModal').classList.add('hidden'); }
-
-function toggleChapter(show) {
-  document.getElementById('chapterWrap').style.display = show ? '' : 'none';
-}
-function toggleEditChapter(show) {
-  document.getElementById('editChapterWrap').style.display = show ? '' : 'none';
-}
-
-// ══════════════════════════════════════
-//  RENDER ALL LOGS
-// ══════════════════════════════════════
-function buildFilterChips() {
-  const chips = document.getElementById('filterChips');
-  if (!chips) return;
-  const options = ['all', ...MENTORS];
-  // Non-owners only see own filter
-  const filtered = SESSION.role === 'owner' ? options : ['all'];
-  chips.innerHTML = filtered.map(m =>
-    `<span class="chip ${filterMentor===m?'on':''}" onclick="setFilter('${m}')">${m === 'all' ? 'All Mentors' : m}</span>`
+/* ── FILTER ── */
+function buildFilterChips(){
+  const el = $('filterChips'); if(!el) return;
+  const opts = SESSION.role==='owner'?['all',...MENTORS]:['all'];
+  el.innerHTML = opts.map(m=>
+    `<span class="chip ${filterMentor===m?'on':''}" onclick="setFilter('${m}')">${m==='all'?'All Mentors':m}</span>`
   ).join('');
 }
+window.setFilter = function(m){ filterMentor=m; buildFilterChips(); renderAll(); };
+window.globalFilter = ()=>renderAll();
 
-function setFilter(m) {
-  filterMentor = m;
-  buildFilterChips();
-  renderAll();
-}
-
-function renderAll() {
-  const body = document.getElementById('allBody');
-  let data = SESSION.role === 'mentor'
-    ? DB.filter(e => e.mentor === SESSION.name)
-    : DB;
-
-  if (filterMentor !== 'all') data = data.filter(e => e.mentor === filterMentor);
-
-  const search = document.getElementById('globalSearch').value.toLowerCase();
-  if (search) data = data.filter(e =>
-    e.mentor.toLowerCase().includes(search) ||
-    e.subject.toLowerCase().includes(search) ||
-    (e.chapter||'').toLowerCase().includes(search)
+/* ── RENDER: ALL LOGS ── */
+function renderAll(){
+  const body = $('allBody'); if(!body||!SESSION) return;
+  let data = SESSION.role==='mentor' ? DB.filter(e=>e.mentor===SESSION.name) : DB;
+  if(filterMentor!=='all') data = data.filter(e=>e.mentor===filterMentor);
+  const srch = ($('globalSearch').value||'').toLowerCase();
+  if(srch) data = data.filter(e=>
+    e.mentor.toLowerCase().includes(srch)||
+    e.subject.toLowerCase().includes(srch)||
+    (e.chapter||'').toLowerCase().includes(srch)
   );
-
-  data = data.slice().sort((a,b) => new Date(b.date) - new Date(a.date));
-  document.getElementById('allCount').textContent = `${data.length} entr${data.length===1?'y':'ies'}`;
-
-  if (!data.length) {
-    body.innerHTML = `<tr><td colspan="7"><div class="empty"><i class="fa-solid fa-inbox"></i><p>No entries found</p></div></td></tr>`;
+  data = data.slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
+  $('allCount').textContent = `${data.length} entr${data.length===1?'y':'ies'}`;
+  if(!data.length){
+    body.innerHTML=`<tr><td colspan="7"><div class="empty"><i class="fa-solid fa-inbox"></i><p>No entries found</p></div></td></tr>`;
     return;
   }
-
-  body.innerHTML = data.map(e => {
-    const d = new Date(e.date);
-    const dateStr = d.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'2-digit' });
-    const editBtn  = canEdit(e)   ? `<button class="btn btn-e btn-xs" onclick="openEdit(${e.id})"><i class="fa-solid fa-pen"></i></button>` : '';
-    const delBtn   = canDelete(e) ? `<button class="btn btn-d btn-xs" onclick="openDelete(${e.id})"><i class="fa-solid fa-trash"></i></button>` : '';
-    const doneBtn  = !e.completed && canEdit(e) ? `<button class="btn btn-s btn-xs" onclick="markComplete(${e.id})"><i class="fa-solid fa-check"></i></button>` : '';
-
+  body.innerHTML = data.map(e=>{
+    const ds  = new Date(e.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'2-digit'});
+    const mc  = MENTOR_INFO[e.mentor]?.color||'#4f9eff';
+    const eB  = canEdit(e)   ?`<button class="btn btn-e btn-xs" onclick="openEdit(${e.id})"><i class="fa-solid fa-pen"></i></button>`:'';
+    const dB  = canDelete(e) ?`<button class="btn btn-d btn-xs" onclick="openDelete(${e.id})"><i class="fa-solid fa-trash"></i></button>`:'';
+    const cB  = !e.completed&&canEdit(e)?`<button class="btn btn-s btn-xs" onclick="markComplete(${e.id})"><i class="fa-solid fa-check"></i></button>`:'';
     return `<tr>
-      <td style="font-size:11px;color:var(--t2);white-space:nowrap">${dateStr}</td>
-      <td>
-        <div style="display:flex;align-items:center;gap:8px">
-          <div style="width:28px;height:28px;border-radius:50%;background:${MENTOR_INFO[e.mentor]?.color||'#4f9eff'}22;border:1px solid ${MENTOR_INFO[e.mentor]?.color||'#4f9eff'}33;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:10px;font-weight:800;color:${MENTOR_INFO[e.mentor]?.color||'#4f9eff'}">${e.mentor.charAt(0)}</div>
-          <span style="font-size:11px;font-weight:600">${e.mentor}</span>
-        </div>
-      </td>
+      <td style="font-size:11px;color:var(--t2);white-space:nowrap">${ds}</td>
+      <td><div style="display:flex;align-items:center;gap:8px">
+        <div style="width:28px;height:28px;border-radius:50%;background:${mc}22;border:1px solid ${mc}33;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:10px;font-weight:800;color:${mc}">${e.mentor.charAt(0)}</div>
+        <span style="font-size:11px;font-weight:600">${e.mentor}</span></div></td>
       <td><span class="badge ${e.type==='WORKSHEET'?'b-ws':'b-ex'}">${e.type==='WORKSHEET'?'WS':'EX'}</span></td>
       <td><span class="badge ${SUBJ_COLORS[e.subject]||''}">${e.subject}</span></td>
-      <td style="font-size:12px;color:var(--t2);max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${e.chapter}">${e.chapter}${e.notes?`<br><span style="font-size:10px;color:var(--t3)">${e.notes}</span>`:''}
-      </td>
+      <td style="font-size:12px;color:var(--t2);max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${e.chapter||''}">${e.chapter||''}${e.notes?`<br><span style="font-size:10px;color:var(--t3)">${e.notes}</span>`:''}</td>
       <td><span class="badge ${e.completed?'b-done':'b-pend'}">${e.completed?'Done':'Pending'}</span></td>
-      <td>
-        <div style="display:flex;gap:5px;align-items:center">
-          ${doneBtn}${editBtn}${delBtn}
-        </div>
-      </td>
+      <td><div style="display:flex;gap:5px">${cB}${eB}${dB}</div></td>
     </tr>`;
   }).join('');
 }
 
-function globalFilter() { renderAll(); }
+function updateCount(){ $('sbCount').textContent = DB.length; }
 
-function updateCount() {
-  const mine = DB.filter(e => SESSION ? e.mentor === SESSION.name : false).length;
-  document.getElementById('sbCount').textContent = DB.length;
-}
-
-// ══════════════════════════════════════
-//  DASHBOARD
-// ══════════════════════════════════════
-function renderDashboard() {
-  if (!SESSION) return;
-
-  document.getElementById('dashGreet').textContent = `Welcome, ${SESSION.name.split(' ')[0]}!`;
-  document.getElementById('dashSub').textContent = SESSION.role === 'owner'
-    ? 'Full team activity overview — owner access'
-    : 'Your personal work log summary';
-
-  const myEntries = DB.filter(e => e.mentor === SESSION.name);
-  const allEntries = SESSION.role === 'owner' ? DB : myEntries;
-  const completed  = allEntries.filter(e => e.completed).length;
-  const pending    = allEntries.filter(e => !e.completed).length;
-  const ws = allEntries.filter(e => e.type === 'WORKSHEET').length;
-  const ex = allEntries.filter(e => e.type === 'EXAM').length;
-
-  document.getElementById('dashStats').innerHTML = `
-    <div class="stat c1"><div class="stat-v">${SESSION.role==='owner'?DB.length:myEntries.length}</div><div class="stat-l">${SESSION.role==='owner'?'Total Entries':'My Entries'}</div></div>
-    <div class="stat c2"><div class="stat-v">${completed}</div><div class="stat-l">Completed</div></div>
-    <div class="stat c3"><div class="stat-v">${pending}</div><div class="stat-l">Pending</div></div>
-    <div class="stat c4"><div class="stat-v">${SESSION.role==='owner'?MENTORS.length:ws}</div><div class="stat-l">${SESSION.role==='owner'?'Mentors':'Worksheets'}</div></div>
-  `;
-
-  // My recent logs
-  const recent = (SESSION.role === 'owner' ? DB : myEntries).slice().sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,6);
-  document.getElementById('dashMyLogs').innerHTML = recent.length
-    ? recent.map(e => `
-      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bdr)">
+/* ── RENDER: DASHBOARD ── */
+function renderDashboard(){
+  if(!SESSION) return;
+  $('dashGreet').textContent = `Welcome, ${SESSION.name.split(' ')[0]}!`;
+  $('dashSub').textContent   = SESSION.role==='owner'?'Full team activity overview — owner access':'Your personal work log summary';
+  const myE  = DB.filter(e=>e.mentor===SESSION.name);
+  const allE = SESSION.role==='owner'?DB:myE;
+  const done = allE.filter(e=>e.completed).length;
+  const pend = allE.filter(e=>!e.completed).length;
+  const ws   = allE.filter(e=>e.type==='WORKSHEET').length;
+  $('dashStats').innerHTML=`
+    <div class="stat c1"><div class="stat-v">${SESSION.role==='owner'?DB.length:myE.length}</div><div class="stat-l">${SESSION.role==='owner'?'Total Entries':'My Entries'}</div></div>
+    <div class="stat c2"><div class="stat-v">${done}</div><div class="stat-l">Completed</div></div>
+    <div class="stat c3"><div class="stat-v">${pend}</div><div class="stat-l">Pending</div></div>
+    <div class="stat c4"><div class="stat-v">${SESSION.role==='owner'?MENTORS.length:ws}</div><div class="stat-l">${SESSION.role==='owner'?'Mentors':'Worksheets'}</div></div>`;
+  const rec = (SESSION.role==='owner'?DB:myE).slice().sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,6);
+  $('dashMyLogs').innerHTML = rec.length
+    ? rec.map(e=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bdr)">
         <span class="badge ${e.type==='WORKSHEET'?'b-ws':'b-ex'}">${e.type==='WORKSHEET'?'WS':'EX'}</span>
-        <div style="flex:1">
-          <div style="font-size:12px;font-weight:600">${e.subject} — ${e.chapter}</div>
-          <div style="font-size:10px;color:var(--t3)">${SESSION.role==='owner'?e.mentor+' · ':''} ${e.date}</div>
-        </div>
-        <span class="badge ${e.completed?'b-done':'b-pend'}" style="font-size:8px">${e.completed?'Done':'Pending'}</span>
-      </div>`).join('')
+        <div style="flex:1"><div style="font-size:12px;font-weight:600">${e.subject} — ${e.chapter}</div>
+        <div style="font-size:10px;color:var(--t3)">${SESSION.role==='owner'?e.mentor+' · ':''} ${e.date}</div></div>
+        <span class="badge ${e.completed?'b-done':'b-pend'}" style="font-size:8px">${e.completed?'Done':'Pending'}</span></div>`).join('')
     : `<div class="empty"><i class="fa-solid fa-inbox"></i><p>No entries yet</p></div>`;
-
-  // Subject breakdown
-  const breakdown = document.getElementById('dashSubjBreak');
-  const subjectData = SUBJECTS.map(s => ({ s, count: allEntries.filter(e=>e.subject===s).length }));
-  const maxCount = Math.max(...subjectData.map(x=>x.count), 1);
-  const subColors = { Biology:'#22d3ee', Chemistry:'#a78bfa', Physics:'#fb923c', Maths:'#4ade80' };
-
-  breakdown.innerHTML = subjectData.map(({s, count}) => `
+  const sub  = SUBJECTS.map(s=>({s,count:allE.filter(e=>e.subject===s).length}));
+  const maxC = Math.max(...sub.map(x=>x.count),1);
+  $('dashSubjBreak').innerHTML = sub.map(({s,count})=>`
     <div style="margin-bottom:12px">
       <div style="display:flex;justify-content:space-between;margin-bottom:5px">
         <span style="font-size:12px;font-weight:600;color:var(--t2)">${s}</span>
-        <span style="font-size:12px;font-family:'Syne',sans-serif;font-weight:700;color:${subColors[s]}">${count}</span>
+        <span style="font-size:12px;font-family:'Syne',sans-serif;font-weight:700;color:${SCOL[s]}">${count}</span>
       </div>
-      <div class="pbar"><div class="pfill" style="width:${Math.round(count/maxCount*100)}%;background:${subColors[s]}"></div></div>
-    </div>
-  `).join('');
+      <div class="pbar"><div class="pfill" style="width:${Math.round(count/maxC*100)}%;background:${SCOL[s]}"></div></div>
+    </div>`).join('');
 }
 
-// ══════════════════════════════════════
-//  REPORTS
-// ══════════════════════════════════════
-function renderReports() {
-  const total    = DB.length;
-  const done     = DB.filter(e=>e.completed).length;
-  const ws       = DB.filter(e=>e.type==='WORKSHEET').length;
-  const ex       = DB.filter(e=>e.type==='EXAM').length;
-
-  document.getElementById('reportStats').innerHTML = `
-    <div class="stat c1"><div class="stat-v">${total}</div><div class="stat-l">Total Entries</div></div>
-    <div class="stat c2"><div class="stat-v">${done}</div><div class="stat-l">Completed</div></div>
-    <div class="stat c3"><div class="stat-v">${ws}</div><div class="stat-l">Worksheets</div></div>
-    <div class="stat c4"><div class="stat-v">${ex}</div><div class="stat-l">Exams</div></div>
-  `;
-
-  const subColors = { Biology:'#22d3ee', Chemistry:'#a78bfa', Physics:'#fb923c', Maths:'#4ade80' };
-  document.getElementById('reportCards').innerHTML = MENTORS.map(m => {
-    const me = DB.filter(e=>e.mentor===m);
-    const wsC = me.filter(e=>e.type==='WORKSHEET').length;
-    const exC = me.filter(e=>e.type==='EXAM').length;
-    const info = MENTOR_INFO[m];
-    return `
-    <div class="card" style="border-top:2px solid ${info.color}">
+/* ── RENDER: REPORTS ── */
+function renderReports(){
+  if(!SESSION) return;
+  $('reportStats').innerHTML=`
+    <div class="stat c1"><div class="stat-v">${DB.length}</div><div class="stat-l">Total Entries</div></div>
+    <div class="stat c2"><div class="stat-v">${DB.filter(e=>e.completed).length}</div><div class="stat-l">Completed</div></div>
+    <div class="stat c3"><div class="stat-v">${DB.filter(e=>e.type==='WORKSHEET').length}</div><div class="stat-l">Worksheets</div></div>
+    <div class="stat c4"><div class="stat-v">${DB.filter(e=>e.type==='EXAM').length}</div><div class="stat-l">Exams</div></div>`;
+  $('reportCards').innerHTML = MENTORS.map(m=>{
+    const me=DB.filter(e=>e.mentor===m), info=MENTOR_INFO[m];
+    const wsC=me.filter(e=>e.type==='WORKSHEET').length, exC=me.filter(e=>e.type==='EXAM').length;
+    return `<div class="card" style="border-top:2px solid ${info.color}">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
         <div style="width:40px;height:40px;border-radius:50%;background:${info.color}22;border:1px solid ${info.color}44;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:${info.color}">${m.charAt(0)}</div>
-        <div>
-          <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700">${m}</div>
-          <div style="font-size:10px;color:var(--t3)">${info.role}</div>
-        </div>
+        <div><div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700">${m}</div><div style="font-size:10px;color:var(--t3)">${info.role}</div></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
-        <div style="background:var(--s2);border:1px solid var(--bdr);border-radius:var(--r);padding:10px;text-align:center">
-          <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--acc)">${wsC}</div>
-          <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:1px">Worksheets</div>
-        </div>
-        <div style="background:var(--s2);border:1px solid var(--bdr);border-radius:var(--r);padding:10px;text-align:center">
-          <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--acc5)">${exC}</div>
-          <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:1px">Exams</div>
-        </div>
+        <div style="background:var(--s2);border:1px solid var(--bdr);border-radius:var(--r);padding:10px;text-align:center"><div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--acc)">${wsC}</div><div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:1px">Worksheets</div></div>
+        <div style="background:var(--s2);border:1px solid var(--bdr);border-radius:var(--r);padding:10px;text-align:center"><div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--acc5)">${exC}</div><div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:1px">Exams</div></div>
       </div>
-      ${SUBJECTS.map(s => {
-        const c = me.filter(e=>e.subject===s).length;
-        const pct = me.length ? Math.round(c/me.length*100) : 0;
+      ${SUBJECTS.map(s=>{const c=me.filter(e=>e.subject===s).length,pct=me.length?Math.round(c/me.length*100):0;
         return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
           <span style="width:70px;font-size:10px;color:var(--t2)">${s}</span>
-          <div style="flex:1;background:var(--s4);border-radius:3px;height:4px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${subColors[s]};border-radius:3px"></div></div>
-          <span style="font-size:10px;font-weight:700;color:${subColors[s]};width:20px;text-align:right">${c}</span>
-        </div>`;
-      }).join('')}
+          <div style="flex:1;background:var(--s4);border-radius:3px;height:4px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${SCOL[s]};border-radius:3px"></div></div>
+          <span style="font-size:10px;font-weight:700;color:${SCOL[s]};width:20px;text-align:right">${c}</span>
+        </div>`;}).join('')}
     </div>`;
   }).join('');
 }
 
-const subColors2 = { Biology:'#22d3ee', Chemistry:'#a78bfa', Physics:'#fb923c', Maths:'#4ade80' };
-
-// ══════════════════════════════════════
-//  PROFILES
-// ══════════════════════════════════════
-function renderProfiles() {
-  const grid = document.getElementById('profileGrid');
-  grid.innerHTML = MENTORS.map(m => {
-    const me   = DB.filter(e=>e.mentor===m);
-    const info = MENTOR_INFO[m];
-    const wsC  = me.filter(e=>e.type==='WORKSHEET').length;
-    const exC  = me.filter(e=>e.type==='EXAM').length;
-    const doneC= me.filter(e=>e.completed).length;
-    return `
-    <div class="mentor-card">
+/* ── RENDER: PROFILES ── */
+function renderProfiles(){
+  if(!SESSION) return;
+  $('profileGrid').innerHTML = MENTORS.map(m=>{
+    const me=DB.filter(e=>e.mentor===m), info=MENTOR_INFO[m];
+    const wsC=me.filter(e=>e.type==='WORKSHEET').length;
+    const exC=me.filter(e=>e.type==='EXAM').length;
+    const dC =me.filter(e=>e.completed).length;
+    return `<div class="mentor-card">
       <div class="mc-avatar" style="background:linear-gradient(135deg,${info.color},${info.color}88)">${m.charAt(0)}</div>
-      <div class="mc-name">${m}</div>
-      <div class="mc-role">${info.role}</div>
+      <div class="mc-name">${m}</div><div class="mc-role">${info.role}</div>
       <div class="mc-stats">
         <div class="mc-stat"><div class="mc-stat-v">${wsC}</div><div class="mc-stat-l">Sheets</div></div>
         <div class="mc-stat"><div class="mc-stat-v">${exC}</div><div class="mc-stat-l">Exams</div></div>
-        <div class="mc-stat"><div class="mc-stat-v">${doneC}</div><div class="mc-stat-l">Done</div></div>
+        <div class="mc-stat"><div class="mc-stat-v">${dC}</div><div class="mc-stat-l">Done</div></div>
         <div class="mc-stat"><div class="mc-stat-v">${me.length}</div><div class="mc-stat-l">Total</div></div>
       </div>
-      <div class="mc-subj">
-        ${info.expertise.map(ex=>`<span class="badge ${subColors2[ex]?'b-'+ex.slice(0,3).toLowerCase():''}" style="font-size:9px">${ex}</span>`).join('')}
-      </div>
+      <div class="mc-subj">${info.expertise.map(s=>`<span class="badge b-${s.slice(0,3).toLowerCase()}" style="font-size:9px">${s}</span>`).join('')}</div>
     </div>`;
   }).join('');
 }
 
-// ══════════════════════════════════════
-//  KEYBOARD CLOSE MODAL
-// ══════════════════════════════════════
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeModal(); closeDeleteModal(); }
-});
+/* ── KEYBOARD ── */
+document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeModal(); closeDeleteModal(); } });
 
-// ══════════════════════════════════════
-//  START
-// ══════════════════════════════════════
+/* ── START ── */
 checkAuth();
 </script>
 </body>
