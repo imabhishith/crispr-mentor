@@ -488,7 +488,29 @@ tr:hover td { background: rgba(255,255,255,0.015); }
 <!-- TOASTS -->
 <div id="toasts"></div>
 
-<script>
+<!-- ═══ FIREBASE SDK ═══ -->
+<script type="module">
+// ══════════════════════════════════════════════════════════════
+//  🔥 FIREBASE CONFIG — PASTE YOUR CONFIG HERE
+//  Get this from: Firebase Console → Project Settings → Your App
+// ══════════════════════════════════════════════════════════════
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, set, push, update, remove, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey:            "PASTE_YOUR_API_KEY_HERE",
+  authDomain:        "PASTE_YOUR_AUTH_DOMAIN_HERE",
+  databaseURL:       "PASTE_YOUR_DATABASE_URL_HERE",
+  projectId:         "PASTE_YOUR_PROJECT_ID_HERE",
+  storageBucket:     "PASTE_YOUR_STORAGE_BUCKET_HERE",
+  messagingSenderId: "PASTE_YOUR_MESSAGING_SENDER_ID_HERE",
+  appId:             "PASTE_YOUR_APP_ID_HERE"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
+const dbRef = ref(db, 'crispr_entries');
+
 // ══════════════════════════════════════
 //  SESSION & AUTH
 // ══════════════════════════════════════
@@ -532,10 +554,38 @@ const MENTOR_INFO = {
   "ZAFIR":          { role: "Maths Mentor",       expertise: ["Maths"],                  color: "#f59e0b" }
 };
 
-let DB = JSON.parse(localStorage.getItem('crispr_db_v2')) || [];
+let DB = [];
 let filterMentor = 'all';
+let _dbLoaded = false;
 
-function save() { localStorage.setItem('crispr_db_v2', JSON.stringify(DB)); }
+// ── FIREBASE REAL-TIME LISTENER ──
+// Keeps DB in sync with Firestore across all users/tabs
+function startFirebaseListener() {
+  onValue(dbRef, snapshot => {
+    const data = snapshot.val();
+    DB = data ? Object.entries(data).map(([fbKey, entry]) => ({ ...entry, _fbKey: fbKey })) : [];
+    _dbLoaded = true;
+    updateCount();
+    renderDashboard();
+    renderAll();
+  });
+}
+
+// ── WRITE HELPERS ──
+async function fbAddEntry(entry) {
+  const newRef = push(dbRef);
+  await set(newRef, entry);
+}
+
+async function fbUpdateEntry(fbKey, updatedEntry) {
+  const entryRef = ref(db, `crispr_entries/${fbKey}`);
+  await update(entryRef, updatedEntry);
+}
+
+async function fbDeleteEntry(fbKey) {
+  const entryRef = ref(db, `crispr_entries/${fbKey}`);
+  await remove(entryRef);
+}
 
 // ══════════════════════════════════════
 //  INIT
@@ -570,9 +620,7 @@ function initApp() {
   }
 
   buildFilterChips();
-  renderDashboard();
-  renderAll();
-  updateCount();
+  startFirebaseListener(); // This replaces the old manual renders — Firebase listener handles it
 }
 
 // ══════════════════════════════════════
@@ -611,7 +659,7 @@ function toast(msg, type='ok') {
 // ══════════════════════════════════════
 //  ENTRY CRUD
 // ══════════════════════════════════════
-function addEntry() {
+async function addEntry() {
   const type    = document.querySelector('input[name="workType"]:checked').value;
   const date    = document.getElementById('eDate').value;
   const subject = document.getElementById('eSubject').value;
@@ -624,14 +672,18 @@ function addEntry() {
   if (!date) { toast('Please select a date.', 'er'); return; }
 
   const entry = { id: Date.now(), mentor, type, date, subject, chapter, notes, completed: false, createdBy: SESSION.name };
-  DB.push(entry);
-  save(); updateCount(); renderDashboard(); renderAll();
-  toast('Work entry added!');
 
-  // Reset form
-  document.getElementById('eDate').value = new Date().toISOString().split('T')[0];
-  document.getElementById('eChapter').value = '';
-  document.getElementById('eNotes').value = '';
+  try {
+    await fbAddEntry(entry);
+    toast('Work entry added!');
+    // Reset form
+    document.getElementById('eDate').value = new Date().toISOString().split('T')[0];
+    document.getElementById('eChapter').value = '';
+    document.getElementById('eNotes').value = '';
+  } catch(err) {
+    toast('Failed to save. Check your connection.', 'er');
+    console.error(err);
+  }
 }
 
 function canEdit(entry) {
@@ -659,15 +711,14 @@ function openEdit(id) {
   document.getElementById('editModal').classList.remove('hidden');
 }
 
-function saveEdit() {
+async function saveEdit() {
   const id = Number(document.getElementById('editId').value);
-  const idx = DB.findIndex(x => x.id === id);
-  if (idx === -1) return;
-  const e = DB[idx];
+  const e = DB.find(x => x.id === id);
+  if (!e) return;
   if (!canEdit(e)) { toast('Permission denied.', 'er'); return; }
 
   const type = document.querySelector('input[name="editType"]:checked').value;
-  DB[idx] = {
+  const updated = {
     ...e,
     type,
     date:      document.getElementById('editDate').value,
@@ -677,9 +728,16 @@ function saveEdit() {
     completed: document.getElementById('editStatus').value === 'true',
     editedAt:  Date.now(), editedBy: SESSION.name
   };
-  save(); renderAll(); renderDashboard();
-  toast('Entry updated!');
-  closeModal();
+  const { _fbKey, ...entryWithoutKey } = updated;
+
+  try {
+    await fbUpdateEntry(e._fbKey, entryWithoutKey);
+    toast('Entry updated!');
+    closeModal();
+  } catch(err) {
+    toast('Failed to update. Check your connection.', 'er');
+    console.error(err);
+  }
 }
 
 function openDelete(id) {
@@ -690,20 +748,31 @@ function openDelete(id) {
   document.getElementById('deleteModal').classList.remove('hidden');
 }
 
-function confirmDelete() {
+async function confirmDelete() {
   const id = Number(document.getElementById('deleteId').value);
-  DB = DB.filter(x => x.id !== id);
-  save(); renderAll(); renderDashboard(); updateCount();
-  toast('Entry deleted.', 'wa');
-  closeDeleteModal();
+  const e = DB.find(x => x.id === id);
+  if (!e) return;
+
+  try {
+    await fbDeleteEntry(e._fbKey);
+    toast('Entry deleted.', 'wa');
+    closeDeleteModal();
+  } catch(err) {
+    toast('Failed to delete. Check your connection.', 'er');
+    console.error(err);
+  }
 }
 
-function markComplete(id) {
+async function markComplete(id) {
   const e = DB.find(x => x.id === id);
   if (!e || !canEdit(e)) { toast('Permission denied.', 'er'); return; }
-  e.completed = true;
-  save(); renderAll(); renderDashboard();
-  toast('Marked as completed!');
+  const { _fbKey, ...entryWithoutKey } = { ...e, completed: true };
+  try {
+    await fbUpdateEntry(e._fbKey, entryWithoutKey);
+    toast('Marked as completed!');
+  } catch(err) {
+    toast('Failed to update. Check your connection.', 'er');
+  }
 }
 
 function closeModal()       { document.getElementById('editModal').classList.add('hidden'); }
